@@ -2,7 +2,7 @@
 #define MIPS_SIMULATOR_HPP
 
 #include "mips_text_parser.hpp"
-#include "define_switches.h"
+#include "define_switches.hpp"
 #include <iostream>
 #include <map>
 #include <string>

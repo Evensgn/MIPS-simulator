@@ -1,5 +1,5 @@
 #include "mips_simulator.hpp"
-#include "define_switches.h"
+#include "define_switches.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>

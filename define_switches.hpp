@@ -1,5 +1,5 @@
-#ifndef DEFINE_SWITCHES_H
-#define DEFINE_SWITCHES_H
+#ifndef DEFINE_SWITCHES_HPP
+#define DEFINE_SWITCHES_HPP
 
 #define TEST_ONLY
 #define DEBUG
@@ -7,4 +7,4 @@
 //#define DEBUG_ENTRY_SPLIT
 //#define DEBUG_TEXT_SPLIT
 
-#endif // DEFINE_SWITCHES_H
+#endif // DEFINE_SWITCHES_HPP

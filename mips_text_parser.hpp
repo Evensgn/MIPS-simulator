@@ -1,7 +1,7 @@
 #ifndef MIPS_TEXT_PARSER_HPP
 #define MIPS_TEXT_PARSER_HPP
 
-#include "define_switches.h"
+#include "define_switches.hpp"
 #include <string>
 #include <vector>
 #include <map>
