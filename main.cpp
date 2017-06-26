@@ -17,8 +17,8 @@ int main()
     buffer << sFile.rdbuf();
     sFile.close();
     mipsText = buffer.str();
-#ifdef DEBUG
-    //cout << mipsText << endl;
+#ifdef DEBUG_READ_TEXT
+    cout << mipsText << endl;
 #endif
     ProcessMIPSText();
 

@@ -162,12 +162,14 @@ public:
 #endif
         while (p1 < str.length()) {
             p2 = p1;
-            if (str[p2] == '\'' || str[p2] == '\"')
+            if (str[p2] == '\'' || str[p2] == '\"') {
                 p2 = SkipString(str, p2, str[p2]);
+                ++p1;
+            }
             else p2 = SkipNonStringToken(str, p2);
             ++argc;
 #ifdef DEBUG_ENTRY_SPLIT
-            cout << string(str, p1, p2) << ", ";
+            cout << string(str, p1, p2 - p1) << ", ";
 #endif
             if (argc == 0) entryType = GetTokenType(string(str, p1, p2 - p1));
             else argv.push_back(string(str, p1, p2 - p1));
