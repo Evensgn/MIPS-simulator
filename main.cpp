@@ -1,4 +1,7 @@
 #include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <map>
 #include <string>
 
@@ -8,13 +11,16 @@ using namespace std;
 typedef unsigned char byte;
 
 const int maxMemoryByte = 4 * 1024 * 1024; // 4MB
-
 const int registerNum = 32 + 2;
 
 map<string, int> registerIdx;
 
+// registers and memory space
 unsigned int registers[registerNum];
 byte memorySpace[maxMemoryByte];
+
+// mips source text
+string mipsText;
 
 unsigned int &reg(const string regName) {
 #ifdef TEST_ONLY
@@ -99,11 +105,32 @@ void RegisterIdxInit() {
 
 void SimulatorInit() {
     RegisterIdxInit();
-    reg("$sp") = ;
+    reg("$sp") = maxMemoryByte;
+    for (int i = 0; i < registerNum; ++i) {
+        if (i == 29) continue; // $sp
+        registers[i] = 0;
+    }
 }
 
 int main(int argc, char *argv[])
 {
     SimulatorInit();
+
+    // read mips text from file *.s
+    ifstream sFile("test.s");
+    stringstream buffer;
+    buffer << sFile.rdbuf();
+    sFile.close();
+    mipsText = buffer.str();
+    cout << mipsText << endl;
+
+    ifstream inFile("test.in");
+    ofstream ansFile("test.ans");
+
+    inFile.close();
+    ansFile.close();
+#ifdef TEST_ONLY
+    cout << "Done." << endl;
+#endif
     return 0;
 }
