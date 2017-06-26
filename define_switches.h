@@ -5,7 +5,7 @@
 #define TEST_ONLY
 // switch to debug mode
 #define DEBUG
-//#define DEBUG_ENTRY_SPLIT
+#define DEBUG_ENTRY_SPLIT
 #define DEBUG_TEXT_SPLIT
 
 #endif // DEFINE_SWITCHES_H

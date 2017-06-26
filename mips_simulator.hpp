@@ -1,7 +1,7 @@
 #ifndef MIPS_SIMULATOR_HPP
 #define MIPS_SIMULATOR_HPP
 
-#include "mips_text_processor.hpp"
+#include "mips_text_parser.hpp"
 #include "define_switches.h"
 #include <iostream>
 #include <map>

@@ -27,15 +27,15 @@ enum TokenType {
 map<string, TokenType> _tokenType;
 
 void TokenTypeInit() {
-    _tokenType["data"] = _data;
-    _tokenType["text"] = _text;
-    _tokenType["align"] = _align;
-    _tokenType["ascii"] = _ascii;
-    _tokenType["asciiz"] = _asciiz;
-    _tokenType["byte"] = _byte;
-    _tokenType["half"] = _half;
-    _tokenType["word"] = _word;
-    _tokenType["space"] = _space;
+    _tokenType[".data"] = _data;
+    _tokenType[".text"] = _text;
+    _tokenType[".align"] = _align;
+    _tokenType[".ascii"] = _ascii;
+    _tokenType[".asciiz"] = _asciiz;
+    _tokenType[".byte"] = _byte;
+    _tokenType[".half"] = _half;
+    _tokenType[".word"] = _word;
+    _tokenType[".space"] = _space;
     _tokenType["add"] = _add;
     _tokenType["addu"] = _addu;
     _tokenType["addiu"] = _addiu;
@@ -130,7 +130,7 @@ int SkipEntry(const string &str, int pos) {
     while (pos < str.length()) {
         if (str[pos] == '\'' || str[pos] == '\"')
             pos = SkipString(str, pos, str[pos]);
-        else if (str[pos] == ':' || str[pos] == ';' || str[pos] == '\n')
+        if (str[pos] == ':' || str[pos] == ';' || str[pos] == '\n')
             break;
         else ++pos;
     }
