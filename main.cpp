@@ -4,9 +4,29 @@
 
 using namespace std;
 
+#define TEST_ONLY
+typedef unsigned char byte;
+
+const int maxMemoryByte = 4 * 1024 * 1024; // 4MB
+
+const int registerNum = 32 + 2;
+
 map<string, int> registerIdx;
 
-void SimulatorInit() {
+unsigned int registers[registerNum];
+byte memorySpace[maxMemoryByte];
+
+unsigned int &reg(const string regName) {
+#ifdef TEST_ONLY
+    if (registerIdx.find(regName) == registerIdx.end()) {
+        cout << "Invalid register name: " << regName << endl;
+        system("pause");
+    }
+#endif
+    return registers[registerIdx[regName]];
+}
+
+void RegisterIdxInit() {
     registerIdx["$0"] = 0;
     registerIdx["$1"] = 1;
     registerIdx["$2"] = 2;
@@ -77,10 +97,13 @@ void SimulatorInit() {
     registerIdx["$hi"] = 33;
 }
 
+void SimulatorInit() {
+    RegisterIdxInit();
+    reg("$sp") = ;
+}
+
 int main(int argc, char *argv[])
 {
-    for (int i = 0; i < 32; ++i)
-        cout << "registerIdx[\"$\"] = " << i << ";\n";
-    //SimulatorInit();
+    SimulatorInit();
     return 0;
 }
