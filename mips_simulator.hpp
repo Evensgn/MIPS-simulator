@@ -1,15 +1,14 @@
 #ifndef MIPS_SIMULATOR_HPP
 #define MIPS_SIMULATOR_HPP
 
+#include "mips_text_processor.hpp"
+#include "define_switches.h"
 #include <iostream>
-#include <iomanip>
 #include <map>
 #include <string>
+#include <vector>
 
 using namespace std;
-
-// switch to local test
-#define TEST_ONLY
 
 typedef unsigned char byte;
 
@@ -108,11 +107,18 @@ void RegisterIdxInit() {
 
 void SimulatorInit() {
     RegisterIdxInit();
+    TokenTypeInit();
     reg("$sp") = maxMemoryByte;
     for (int i = 0; i < registerNum; ++i) {
         if (i == 29) continue; // $sp
         registers[i] = 0;
     }
+}
+
+vector<Entry> entries;
+
+void ProcessMIPSText() {
+    entries = SplitToEntries(mipsText);
 }
 
 #endif // MIPS_SIMULATOR_HPP

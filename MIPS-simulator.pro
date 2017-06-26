@@ -7,4 +7,5 @@ SOURCES += main.cpp
 
 HEADERS += \
     mips_text_processor.hpp \
-    mips_simulator.hpp
+    mips_simulator.hpp \
+    define_switches.h

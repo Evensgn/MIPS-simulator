@@ -1,7 +1,6 @@
 #include "mips_simulator.hpp"
-#include "mips_text_processor.hpp"
+#include "define_switches.h"
 #include <iostream>
-#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -18,9 +17,10 @@ int main()
     buffer << sFile.rdbuf();
     sFile.close();
     mipsText = buffer.str();
-#ifdef TEST_ONLY
-    cout << mipsText << endl;
+#ifdef DEBUG
+    //cout << mipsText << endl;
 #endif
+    ProcessMIPSText();
 
     ifstream inFile("test.in");
     ofstream ansFile("test.ans");
