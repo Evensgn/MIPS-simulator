@@ -6,6 +6,6 @@ CONFIG -= qt
 SOURCES += main.cpp
 
 HEADERS += \
-    mips_text_processor.hpp \
     mips_simulator.hpp \
-    define_switches.h
+    define_switches.h \
+    mips_text_parser.hpp

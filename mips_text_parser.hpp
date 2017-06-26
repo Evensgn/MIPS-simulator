@@ -1,5 +1,5 @@
-#ifndef MIPS_TEXT_PROCESSOR_HPP
-#define MIPS_TEXT_PROCESSOR_HPP
+#ifndef MIPS_TEXT_PARSER_HPP
+#define MIPS_TEXT_PARSER_HPP
 
 #include "define_switches.h"
 #include <string>
@@ -195,4 +195,4 @@ vector<Entry> SplitToEntries(const string &str) {
     return ret;
 }
 
-#endif // MIPS_TEXT_PROCESSOR_HPP
+#endif // MIPS_TEXT_PARSER_HPP
