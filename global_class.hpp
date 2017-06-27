@@ -22,8 +22,10 @@ enum TokenType {
     _nop, _syscall
 };
 
-class Operation {
-    byte 
+class Instruction {
+private:
+    byte op, rs, rt, rd;
+    int const_addr;
 };
 
 #endif // GLOBAL_CLASS_HPP

@@ -1,12 +1,20 @@
 # MIPS-simulator
+
 Course project of PPCA 2017 (MS106), ACM Honors Class, SJTU.
 
+## Related Documents
+[Specified instruction subset](documents/instruction-op-code.txt) (involved instructions in this project)
+
 ## Development Log
+
 For my detailed development log, please check [here](Development-Log.md).
 
 ## Code Structure & Design
+
 ### Instruction Encoding Format
-In order to store instructions (in the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format:
+
+In order to store instructions (within the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format:
+
 <table>
   <tr>
     <th> op </th>
@@ -25,4 +33,5 @@ In order to store instructions (in the specified instruction subset) in memory, 
     <td> 8 byte </td>
   </tr>
 </table>
+
 Each instruction is stored in memory as 8 byte of binary digits.
