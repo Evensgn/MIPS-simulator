@@ -1,6 +1,8 @@
 #ifndef GLOBAL_CLASS_HPP
 #define GLOBAL_CLASS_HPP
 
+typedef unsigned char byte;
+
 enum EntryType {
     dotMark, dotData, dotText
 };
@@ -18,6 +20,10 @@ enum TokenType {
     _sb, _sh, _sw,
     _move, _mfhi, _mflo,
     _nop, _syscall
+};
+
+class Operation {
+    byte 
 };
 
 #endif // GLOBAL_CLASS_HPP

@@ -193,10 +193,11 @@ public:
         }
         int nowIdx = 0;
         for (size_t i = 0; i < ret.size(); ++i) {
-            if (ret[i].tokenType == _label) continue;
+            if (ret[i].tokenType == _label || ret[i].entryType == dotMark) continue;
             ret[i].idx = nowIdx++;
         }
         for (size_t i = ret.size(); i > 0; --i) {
+            if (ret[i - 1].entryType == dotMark) continue;
             if (ret[i - 1].tokenType == _label)
                 ret[i - 1].idx = nowIdx;
             else nowIdx = ret[i - 1].idx;

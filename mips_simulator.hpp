@@ -127,14 +127,20 @@ public:
     void ProcessMIPSText(const string &str) {
         mipsText = str;
         entries = MIPS_Text_Parser::instance().SplitToEntries(mipsText);
-        /*for (size_t i = 0; i < entries.size(); ++i) {
+        for (size_t i = 0; i < entries.size(); ++i) {
             if (entries[i].entryType == dotMark) continue;
-            if (entries[i].tokenType == _label) continue;
+            if (entries[i].tokenType == _label) {
+                
+                continue;
+            }
             if (entries[i].entryType == dotData) {
                 
+                continue;
             }
-            else 
-        }*/
+            if (entries[i].entryType == dotText) {
+                
+            }
+        }
     }
 };
     
