@@ -10,3 +10,4 @@
 * Learned something about MIPS memory organization and solutions to hazards
 * Changed three classes into singleton pattern, following the advice of Yunwei Ren
 * Designed instruction encoding format
+* Finished the parser

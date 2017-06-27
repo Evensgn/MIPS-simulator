@@ -23,7 +23,7 @@ enum TokenType {
 };
 
 class Instruction {
-private:
+public:
     byte op, rs, rt, rd;
     int const_addr;
 };
