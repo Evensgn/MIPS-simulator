@@ -18,7 +18,7 @@ For my detailed development log, please check [here](Development-Log.md).
 
 ### Main Classes
 
-** classes of singleton design pattern: **
+**classes of singleton design pattern:**
 * MIPS_Simulator
 * MIPS_Text_Parser
 

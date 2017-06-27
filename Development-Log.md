@@ -11,3 +11,4 @@
 * Changed three classes into singleton pattern, following the advice of Yunwei Ren
 * Designed instruction encoding format
 * Finished the parser
+* 
