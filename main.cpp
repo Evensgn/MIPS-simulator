@@ -1,9 +1,5 @@
 #include "mips_simulator.hpp"
-#include "define_switches.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+#include "include_define.hpp"
 
 using namespace std;
 
@@ -27,7 +23,7 @@ int main()
 
     inFile.close();
     ansFile.close();
-#ifdef TEST_ONLY
+#ifdef DEBUG
     cout << "Done." << endl;
 #endif
     return 0;

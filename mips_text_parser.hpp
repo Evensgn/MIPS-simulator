@@ -1,11 +1,7 @@
 #ifndef MIPS_TEXT_PARSER_HPP
 #define MIPS_TEXT_PARSER_HPP
 
-#include "define_switches.hpp"
-#include <string>
-#include <vector>
-#include <map>
-#include <iostream>
+#include "include_define.hpp"
 
 using namespace std;
 
@@ -97,7 +93,7 @@ TokenType GetTokenType(const string &str) {
 // skip string like this "abc 123\"xyz" or '\''
 int SkipString(const string &str, int pos, char closedParenthesis) {
     ++pos;
-    while (pos < str.length()) {
+    while (pos < (int)str.length()) {
         if (str[pos] == closedParenthesis) break;
         if (str[pos] == '\\') pos += 2;
         else ++pos;
@@ -108,7 +104,7 @@ int SkipString(const string &str, int pos, char closedParenthesis) {
 // skip non-string token like "$v0" or "$v0," or "_Label1"
 int SkipNonStringToken(const string &str, int pos) {
     ++pos;
-    while (pos < str.length()) {
+    while (pos < (int)str.length()) {
         if (str[pos] == ' ' || str[pos] == '\n' || str[pos] == ',') break;
         else ++pos;
     }
@@ -118,7 +114,7 @@ int SkipNonStringToken(const string &str, int pos) {
 // jump to the beginning of the next token
 int JumpToNextToken(const string &str, int pos) {
     ++pos;
-    while (pos < str.length()) {
+    while (pos < (int)str.length()) {
         if (str[pos] != ' ' && str[pos] != '\t' && str[pos] != '\n') break;
         else ++pos;
     }
@@ -127,7 +123,7 @@ int JumpToNextToken(const string &str, int pos) {
 
 int SkipEntry(const string &str, int pos) {
     ++pos;
-    while (pos < str.length()) {
+    while (pos < (int)str.length()) {
         if (str[pos] == '\'' || str[pos] == '\"')
             pos = SkipString(str, pos, str[pos]);
         if (str[pos] == ':' || str[pos] == ';' || str[pos] == '\n')
@@ -139,7 +135,7 @@ int SkipEntry(const string &str, int pos) {
 
 int JumpToNextEntry(const string &str, int pos) {
     ++pos;
-    while (pos < str.length()) {
+    while (pos < (int)str.length()) {
         if (str[pos] != ' ' && str[pos] != '\t' && str[pos] != '\n' && str[pos] != ';') break;
         else ++pos;
     }
@@ -150,28 +146,29 @@ int JumpToNextEntry(const string &str, int pos) {
 class Entry {
 public:
     TokenType entryType;
-    unsigned short argc;
     vector<string> argv;
+    int idx;
     Entry() = default;
-public:
     Entry(const string &str) {
         int p1 = JumpToNextToken(str, -1), p2;
-        argc = -1;  
+        bool isArg = false;
 #ifdef DEBUG_ENTRY_SPLIT
         cout << "[";
 #endif
-        while (p1 < str.length()) {
+        while (p1 < (int)str.length()) {
             p2 = p1;
             if (str[p2] == '\'' || str[p2] == '\"') {
                 p2 = SkipString(str, p2, str[p2]);
                 ++p1;
             }
             else p2 = SkipNonStringToken(str, p2);
-            ++argc;
 #ifdef DEBUG_ENTRY_SPLIT
             cout << string(str, p1, p2 - p1) << ", ";
 #endif
-            if (argc == 0) entryType = GetTokenType(string(str, p1, p2 - p1));
+            if (!isArg) {
+                entryType = GetTokenType(string(str, p1, p2 - p1));
+                isArg = true;
+            }
             else argv.push_back(string(str, p1, p2 - p1));
             p1 = JumpToNextToken(str, p2);
         }
@@ -181,11 +178,21 @@ public:
     }
 };
 
+class Operation {
+private:
+    TokenType operationType;
+
+    Operation() = default;
+    Operation(const Entry &entry): operationType(entry.entryType) {
+
+    }
+};
+
 // split the whole text into entries
 vector<Entry> SplitToEntries(const string &str) {
     vector<Entry> ret;
     int p1 = JumpToNextEntry(str, -1), p2;
-    while (p1 < str.length()) {
+    while (p1 < (int)str.length()) {
         p2 = p1;
         p2 = SkipEntry(str, p2);
 #ifdef DEBUG_TEXT_SPLIT
@@ -194,6 +201,8 @@ vector<Entry> SplitToEntries(const string &str) {
         ret.push_back(Entry(string(str, p1, p2 - p1)));
         p1 = JumpToNextEntry(str, p2);
     }
+    for (size_t i = 0; i < ret.size(); ++i)
+        ret[i].idx = i;
     return ret;
 }
 

@@ -8,4 +8,5 @@ SOURCES += main.cpp
 HEADERS += \
     mips_simulator.hpp \
     mips_text_parser.hpp \
-    define_switches.hpp
+    operation_processor.hpp \
+    include_define.hpp

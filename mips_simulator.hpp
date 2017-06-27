@@ -2,11 +2,8 @@
 #define MIPS_SIMULATOR_HPP
 
 #include "mips_text_parser.hpp"
-#include "define_switches.hpp"
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
+#include "include_define.hpp"
+#include "operation_processor.hpp"
 
 using namespace std;
 
@@ -25,7 +22,7 @@ byte memorySpace[maxMemoryByte];
 string mipsText;
 
 unsigned int &reg(const string regName) {
-#ifdef TEST_ONLY
+#ifdef DEBUG
     if (registerIdx.find(regName) == registerIdx.end()) {
         cout << "Invalid register name: " << regName << endl;
         system("pause");
@@ -99,6 +96,7 @@ void RegisterIdxInit() {
     registerIdx["$gp"] = 28;
     registerIdx["$sp"] = 29;
     registerIdx["$fp"] = 30;
+    registerIdx["$s8"] = 30;
     registerIdx["$ra"] = 31;
 
     registerIdx["$lo"] = 32;
