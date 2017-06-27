@@ -3,20 +3,22 @@
 
 using namespace std;
 
+MIPS_Simulator mipsSimulator;
+
 int main()
 {
-    SimulatorInit();
-
+    mipsSimulator.SimulatorInit();
+    
     // read mips text from file *.s
     ifstream sFile("test.s");
     stringstream buffer;
     buffer << sFile.rdbuf();
     sFile.close();
-    mipsText = buffer.str();
+    string mipsSourceText = buffer.str();
 #ifdef DEBUG_READ_TEXT
-    cout << mipsText << endl;
+    cout << mipsSourceText << endl;
 #endif
-    ProcessMIPSText();
+    mipsSimulator.ProcessMIPSText(mipsSourceText);
 
     ifstream inFile("test.in");
     ofstream ansFile("test.ans");
