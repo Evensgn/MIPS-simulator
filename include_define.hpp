@@ -16,5 +16,6 @@
 //#define DEBUG_ENTRY_SPLIT
 //#define DEBUG_TEXT_SPLIT
 //#define DEBUG_ENTRY_INDEX
+//#define DEBUG_ENTRY_TYPE
 
 #endif // INCLUDE_DEFINE_HPP

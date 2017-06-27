@@ -12,6 +12,9 @@ typedef unsigned char byte;
 const int maxMemoryByte = 4 * 1024 * 1024; // 4MB
 const int registerNum = 32 + 2;
 
+// memory management
+int textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop;
+
 map<string, int> registerIdx;
 
 // registers and memory space

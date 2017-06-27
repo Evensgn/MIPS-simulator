@@ -5,6 +5,10 @@
 
 using namespace std;
 
+enum EntryType {
+    dotMark, dotData, dotText
+};
+
 enum TokenType {
     _label,
     _data, _text,
@@ -145,7 +149,8 @@ int JumpToNextEntry(const string &str, int pos) {
 // split each entry into [tokenType, arg0, arg1, ...]
 class Entry {
 public:
-    TokenType entryType;
+    TokenType tokenType;
+    EntryType entryType;
     vector<string> argv;
     int idx;
 
@@ -167,7 +172,7 @@ public:
             cout << string(str, p1, p2 - p1) << ", ";
 #endif
             if (!isArg) {
-                entryType = GetTokenType(string(str, p1, p2 - p1));
+                tokenType = GetTokenType(string(str, p1, p2 - p1));
                 isArg = true;
             }
             else argv.push_back(string(str, p1, p2 - p1));
@@ -184,7 +189,7 @@ public:
     TokenType operationType;
 
     Operation() = default;
-    Operation(const Entry &entry): operationType(entry.entryType) {
+    Operation(const Entry &entry): operationType(entry.tokenType) {
 
     }
 };
@@ -204,11 +209,11 @@ vector<Entry> SplitToEntries(const string &str) {
     }
     int nowIdx = 0;
     for (size_t i = 0; i < ret.size(); ++i) {
-        if (ret[i].entryType == _label) continue;
+        if (ret[i].tokenType == _label) continue;
         ret[i].idx = nowIdx++;
     }
     for (size_t i = ret.size(); i > 0; --i) {
-        if (ret[i - 1].entryType == _label)
+        if (ret[i - 1].tokenType == _label)
             ret[i - 1].idx = nowIdx;
         else nowIdx = ret[i - 1].idx;
     }
@@ -216,6 +221,21 @@ vector<Entry> SplitToEntries(const string &str) {
     for (size_t i = 0; i < ret.size(); ++i)
         cout << ret[i].idx << endl;
 #endif
+    EntryType nowEntryType = dotMark;
+    for (size_t i = 0; i < ret.size(); ++i) {
+        if (ret[i].tokenType == _data) {
+            ret[i].entryType = dotMark;
+            nowEntryType = dotData;
+        }
+        else if (ret[i].tokenType == _text) {
+            ret[i].entryType = dotMark;
+            nowEntryType = dotText;
+        }
+        else ret[i].entryType = nowEntryType;
+#ifdef DEBUG_ENTRY_TYPE
+        cout << "Entry type: " << ret[i].entryType << endl;
+#endif
+    }
     return ret;
 }
 
