@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <fstream>
 #include <sstream>
+#include "evensgn_string.hpp"
 
 #define DEBUG
 //#define DEBUG_READ_TEXT
