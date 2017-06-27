@@ -118,6 +118,7 @@ public:
         RegisterIdxInit();
         MIPS_Text_Parser::instance().TokenTypeInit();
         reg("$sp") = maxMemoryByte;
+        textMemoryTop = 0;
         for (int i = 0; i < registerNum; ++i) {
             if (i == 29) continue; // $sp
             registers[i] = 0;
@@ -127,21 +128,21 @@ public:
     void ProcessMIPSText(const string &str) {
         mipsText = str;
         entries = MIPS_Text_Parser::instance().SplitToEntries(mipsText);
-        for (size_t i = 0; i < entries.size(); ++i) {
-            if (entries[i].entryType == dotMark) continue;
-            if (entries[i].tokenType == _label) {
-                
+        // process instructions
+        /*for (size_t i = 0; i < entries.size(); ++i) {
+            if (entries[i].entryType != dotText || entries[i].tokenType == _label)
                 continue;
-            }
-            if (entries[i].entryType == dotData) {
-                
-                continue;
-            }
-            if (entries[i].entryType == dotText) {
-                
-            }
+            *(reinterpret_cast<Instruction*>(&memorySpace[textMemoryTop])) = EntryToInstruction(entries[i]);
         }
+        staticDataMemoryTop = textMemoryTop;
+        // process static data
+        for (size_t i = 0; i < entries.size(); ++i) {
+            if (entries[i].entryType != dotData || entries[i].tokenType == _label)
+                continue;
+            
+        }*/
     }
-};
     
+};
+
 #endif // MIPS_SIMULATOR_HPP

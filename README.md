@@ -1,6 +1,8 @@
 # MIPS-simulator
 
-Course project of PPCA 2017 (MS106), ACM Honors Class, SJTU.
+Zhou Fan (@Evensgn)
+
+This is a course project of PPCA 2017 (MS106), ACM Honors Class, SJTU.
 
 ## Related Documents
 
@@ -14,6 +16,12 @@ For my detailed development log, please check [here](Development-Log.md).
 
 ## Code Structure & Design
 
+### Main Classes
+
+** classes of singleton design pattern: **
+* MIPS_Simulator
+* MIPS_Text_Parser
+
 ### Instruction Encoding Format
 
 In order to store instructions (within the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format:
@@ -25,7 +33,7 @@ In order to store instructions (within the specified instruction subset) in memo
     <th> rt </th>
     <th> rd </th>
     <th> constant or address </th>
-    <th bgcolor=red> total </th>
+    <th> total </th>
   </tr>
   <tr>
     <td> 1 byte </td>
