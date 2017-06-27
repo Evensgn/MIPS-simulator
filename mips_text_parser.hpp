@@ -148,6 +148,7 @@ public:
     TokenType entryType;
     vector<string> argv;
     int idx;
+
     Entry() = default;
     Entry(const string &str) {
         int p1 = JumpToNextToken(str, -1), p2;
@@ -179,7 +180,7 @@ public:
 };
 
 class Operation {
-private:
+public:
     TokenType operationType;
 
     Operation() = default;
@@ -201,8 +202,20 @@ vector<Entry> SplitToEntries(const string &str) {
         ret.push_back(Entry(string(str, p1, p2 - p1)));
         p1 = JumpToNextEntry(str, p2);
     }
+    int nowIdx = 0;
+    for (size_t i = 0; i < ret.size(); ++i) {
+        if (ret[i].entryType == _label) continue;
+        ret[i].idx = nowIdx++;
+    }
+    for (size_t i = ret.size(); i > 0; --i) {
+        if (ret[i - 1].entryType == _label)
+            ret[i - 1].idx = nowIdx;
+        else nowIdx = ret[i - 1].idx;
+    }
+#ifdef DEBUG_ENTRY_INDEX
     for (size_t i = 0; i < ret.size(); ++i)
-        ret[i].idx = i;
+        cout << ret[i].idx << endl;
+#endif
     return ret;
 }
 
