@@ -133,6 +133,7 @@ private:
     
     // split each entry into [tokenType, arg0, arg1, ...]
     class Entry {
+        friend class MIPS_Text_Parser;
     private:
         TokenType tokenType;
         EntryType entryType;
@@ -141,7 +142,7 @@ private:
     public:
         Entry() = default;
         Entry(const string &str) {
-            int p1 = JumpToNextToken(str, -1), p2;
+            int p1 = MIPS_Text_Parser::instance().JumpToNextToken(str, -1), p2;
             bool isArg = false;
 #ifdef DEBUG_ENTRY_SPLIT
             cout << "[";
@@ -149,19 +150,19 @@ private:
             while (p1 < (int)str.length()) {
                 p2 = p1;
                 if (str[p2] == '\'' || str[p2] == '\"') {
-                    p2 = SkipString(str, p2, str[p2]);
+                    p2 = MIPS_Text_Parser::instance().SkipString(str, p2, str[p2]);
                     ++p1;
                 }
-                else p2 = SkipNonStringToken(str, p2);
+                else p2 = MIPS_Text_Parser::instance().SkipNonStringToken(str, p2);
 #ifdef DEBUG_ENTRY_SPLIT
                 cout << string(str, p1, p2 - p1) << ", ";
 #endif
                 if (!isArg) {
-                    tokenType = GetTokenType(string(str, p1, p2 - p1));
+                    tokenType = MIPS_Text_Parser::instance().GetTokenType(string(str, p1, p2 - p1));
                     isArg = true;
                 }
                 else argv.push_back(string(str, p1, p2 - p1));
-                p1 = JumpToNextToken(str, p2);
+                p1 = MIPS_Text_Parser::instance().JumpToNextToken(str, p2);
             }
 #ifdef DEBUG_ENTRY_SPLIT
             cout << "]" << endl;
@@ -169,8 +170,13 @@ private:
         }
     };
     
-public:
     MIPS_Text_Parser() = default;
+    
+public:
+    static MIPS_Text_Parser& instance() {
+        static MIPS_Text_Parser ins;
+        return ins;
+    }
     
     // split the whole text into entries
     vector<Entry> SplitToEntries(const string &str) {

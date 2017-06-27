@@ -8,4 +8,4 @@
 
 **June 27**
 * Learned something about MIPS memory organization and solutions to hazards
-
+* Changed some main classes into singleton pattern, following the advice of Yunwei Ren

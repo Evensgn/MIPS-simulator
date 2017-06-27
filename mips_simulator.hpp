@@ -21,7 +21,7 @@ private:
     // mips source text
     string mipsText;
     
-    vector<Entry> entries;
+    vector<MIPS_Text_Parser::Entry> entries;
     
     unsigned int &reg(const string regName) {
 #ifdef DEBUG_REGISTER_NAME
@@ -105,13 +105,18 @@ private:
         registerIdx["$hi"] = 33;
     }
     
+    MIPS_Simulator() = default;
+
 public: 
     
-    MIPS_Simulator() = default;
+    static MIPS_Simulator& instance() {
+        static MIPS_Simulator ins;
+        return ins;
+    }
     
     void SimulatorInit() {
         RegisterIdxInit();
-        TokenTypeInit();
+        MIPS_Text_Parser::instance().TokenTypeInit();
         reg("$sp") = maxMemoryByte;
         for (int i = 0; i < registerNum; ++i) {
             if (i == 29) continue; // $sp
@@ -121,7 +126,7 @@ public:
     
     void ProcessMIPSText(const string &str) {
         mipsText = str;
-        entries = SplitToEntries(mipsText);
+        entries = MIPS_Text_Parser::instance().SplitToEntries(mipsText);
         /*for (size_t i = 0; i < entries.size(); ++i) {
             if (entries[i].entryType == dotMark) continue;
             if (entries[i].tokenType == _label) continue;

@@ -3,11 +3,9 @@
 
 using namespace std;
 
-MIPS_Simulator mipsSimulator;
-
 int main()
 {
-    mipsSimulator.SimulatorInit();
+    MIPS_Simulator::instance().SimulatorInit();
     
     // read mips text from file *.s
     ifstream sFile("test.s");
@@ -18,7 +16,7 @@ int main()
 #ifdef DEBUG_READ_TEXT
     cout << mipsSourceText << endl;
 #endif
-    mipsSimulator.ProcessMIPSText(mipsSourceText);
+    MIPS_Simulator::instance().ProcessMIPSText(mipsSourceText);
 
     ifstream inFile("test.in");
     ofstream ansFile("test.ans");
