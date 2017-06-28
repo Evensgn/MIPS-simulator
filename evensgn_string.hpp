@@ -6,8 +6,11 @@
 
 int StringToInteger(const std::string &str) {
     int ret;
-    std::stringstream ss(str);
-    ss >> ret;
+    if (str == "") ret = 0;
+    else {
+        std::stringstream ss(str);
+        ss >> ret;
+    } 
     return ret;
 }
 

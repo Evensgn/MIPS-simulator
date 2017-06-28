@@ -100,7 +100,7 @@ private:
     string GetStringBetweenBracket(const string &str) {
         size_t pos1 = 0, pos2 = 0;
         while (str[pos1] != '(' && pos1 < str.size()) ++pos1;
-        while (str[pos2] != '(' && pos2 < str.size()) ++pos2;
+        while (str[pos2] != ')' && pos2 < str.size()) ++pos2;
         return string(str, pos1 + 1, pos2 - pos1 - 1);
     }
     
@@ -184,6 +184,62 @@ private:
         return ret;
     }
     
+    
+    void ProcessDataEntry(const Entry &entry, byte* memorySpace, int &staticDataMemoryTop) {
+        int ele;
+        switch (entry.tokenType) {
+        case _align:
+            ele = 1 << StringToInteger(entry.argv[0]);
+            while (staticDataMemoryTop % ele != 0 && staticDataMemoryTop < maxMemoryByte) 
+                memorySpace[staticDataMemoryTop++] = byte(0);    
+            break;
+        case _ascii:
+            for (size_t i = 0; i < entry.argv[0].length(); ++i) {
+                *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = \
+                    entry.argv[0].at(i);
+                staticDataMemoryTop += sizeof(char);            
+            }
+            break;
+        case _asciiz:
+            for (size_t i = 0; i < entry.argv[0].length(); ++i) {
+                *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = \
+                    entry.argv[0].at(i);
+                staticDataMemoryTop += sizeof(char);            
+            }
+            *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = '\0';
+            staticDataMemoryTop += sizeof(char);
+            break;
+        case _byte:
+        case _half:
+        case _word:
+            for (size_t i = 0; i < entry.argv.size(); ++i) {
+                if (entry.argv[i].at(0) == '\'') 
+                    *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = \
+                        DecodeEscapedString(string(entry.argv[i], 1, entry.argv[i].length() - 2)).at(0);
+                else
+                    *(reinterpret_cast<int*>(memorySpace + staticDataMemoryTop)) = \
+                        StringToInteger(entry.argv[i]);
+                switch (entry.tokenType) {
+                case _byte:
+                    staticDataMemoryTop += 1;
+                    break;
+                case _half:
+                    staticDataMemoryTop += 2;
+                    break;
+                case _word:
+                    staticDataMemoryTop += 4;
+                    break;
+                default: break;
+                }
+            }
+            break;
+        case _space:
+            staticDataMemoryTop += StringToInteger(entry.argv[0]);
+            break;
+        default: break;
+        }
+    }
+    
     Entry_Processor() = default;
     Entry_Processor(Entry_Processor const&);
     Entry_Processor& operator=(Entry_Processor const&);
@@ -210,6 +266,7 @@ public:
             if (entries[i].entryType != dotData || entries[i].tokenType == _label)
                 continue;
             labelIdxAddress[entries[i].idx] = staticDataMemoryTop;
+            ProcessDataEntry(entries[i], memorySpace, staticDataMemoryTop);
         }
         dynamicDataMemoryTop = staticDataMemoryTop;
         textMemoryTop = 0;

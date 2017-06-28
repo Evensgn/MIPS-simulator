@@ -114,7 +114,7 @@ private:
         while (pos < (int)str.length()) {
             if (str[pos] == '\'' || str[pos] == '\"')
                 pos = SkipString(str, pos, str[pos]);
-            if (str[pos] == ':' || str[pos] == ';' || str[pos] == '\n')
+            if (str[pos] == ':' || str[pos] == ';' || str[pos] == '\n' || str[pos] == '#')
                 break;
             else ++pos;
         }
@@ -122,8 +122,13 @@ private:
     }
     
     int JumpToNextEntry(const string &str, int pos) {
-        ++pos;
+        if (str[pos] != '#') ++pos;
         while (pos < (int)str.length()) {
+            if (str[pos] == '#') {
+                while (pos < (int)str.length() && str[pos] != '\n') ++pos;
+                ++pos;
+                continue;
+            }
             if (str[pos] != ' ' && str[pos] != '\t' && str[pos] != '\n' && str[pos] != ';') break;
             else ++pos;
         }

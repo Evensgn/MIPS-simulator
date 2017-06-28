@@ -15,4 +15,5 @@ Zhou Fan (@Evensgn)
 * Finished the parser
 
 **June 28**
-* 
+* Finished the entry processor, which stores all instructions into memory and deal with static data memory
+
