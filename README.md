@@ -52,6 +52,6 @@ In order to store instructions (within the specified instruction subset) in memo
 
 Each instruction is stored in memory as 16 byte of binary digits.
 
-* In some instructions, Src2 may either be a register `rt` or an immediate number `constant`, and if Scr2 is `constant`, `rt == 255`.
+The default value of `rd`, `rs` and `rt` is 255 so that:
+* In some instructions, `Src2` may either be a register `rt` or an immediate number `constant`, and if `Scr2` is `constant`, `rt == 255`.
 * For `mul`, `mulu`, `div` and `divu`, if the instruction is in format of `op rs rt`, `rd == 255`.
-
