@@ -3,7 +3,6 @@
 
 #include "mips_text_parser.hpp"
 #include "include_define.hpp"
-#include "operation_processor.hpp"
 
 using namespace std;
 
@@ -129,10 +128,11 @@ public:
         mipsText = str;
         entries = MIPS_Text_Parser::instance().SplitToEntries(mipsText);
         // process instructions
-        /*for (size_t i = 0; i < entries.size(); ++i) {
+        for (size_t i = 0; i < entries.size(); ++i) {
             if (entries[i].entryType != dotText || entries[i].tokenType == _label)
                 continue;
-            *(reinterpret_cast<Instruction*>(&memorySpace[textMemoryTop])) = EntryToInstruction(entries[i]);
+            *(reinterpret_cast<Instruction*>(memorySpace + textMemoryTop)) = EntryToInstruction(entries[i]);
+            textMemoryTop += sizeof(Instruction);
         }
         staticDataMemoryTop = textMemoryTop;
         // process static data
@@ -140,7 +140,7 @@ public:
             if (entries[i].entryType != dotData || entries[i].tokenType == _label)
                 continue;
             
-        }*/
+        }
     }
     
 };
