@@ -11,6 +11,7 @@
 #include <sstream>
 #include "evensgn_string.hpp"
 #include "global_class.hpp"
+#include "utility.hpp"
 
 typedef unsigned char byte;
 
@@ -24,5 +25,6 @@ const int registerNum = 32 + 2;
 #define DEBUG_TEXT_SPLIT
 #define DEBUG_ENTRY_INDEX
 #define DEBUG_ENTRY_TYPE
+#define DEBUG_ENTRY_TO_INSTRUCTION
 
 #endif // INCLUDE_DEFINE_HPP

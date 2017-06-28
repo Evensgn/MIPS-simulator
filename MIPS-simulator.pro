@@ -11,4 +11,5 @@ HEADERS += \
     include_define.hpp \
     evensgn_string.hpp \
     global_class.hpp \
-    entry_processor.hpp
+    entry_processor.hpp \
+    utility.hpp

@@ -93,7 +93,7 @@ private:
     int SkipNonStringToken(const string &str, int pos) {
         ++pos;
         while (pos < (int)str.length()) {
-            if (str[pos] == ' ' || str[pos] == '\n' || str[pos] == ',') break;
+            if (str[pos] == ' ' || str[pos] == '\t' || str[pos] == '\n' || str[pos] == ',') break;
             else ++pos;
         }
         return pos;
@@ -150,6 +150,7 @@ private:
 #endif
             if (!isArg) {
                 ret.tokenType = GetTokenType(string(str, p1, p2 - p1));
+                if (ret.tokenType == _label) ret.labelName = string(str, p1, p2 - p1);
                 isArg = true;
             }
             else ret.argv.push_back(string(str, p1, p2 - p1));

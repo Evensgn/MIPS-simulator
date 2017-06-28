@@ -12,7 +12,7 @@ xoru rd rs rt / xoru rd rs const
 neg rd rs
 negu rd rs
 rem rd rs rt / rem rd rs const
-remu rd rs rt / remu rd re const
+remu rd rs rt / remu rd rs const
 li rd const
 seq rd rs rt / seq rd rs const
 sge rd rs rt / sge rd rs const
