@@ -14,7 +14,7 @@ enum TokenType {
     _add, _addu, _addiu, _sub, _subu, _xor, _xoru, _neg, _negu, _rem, _remu,
     _mul, _mulu, _div, _divu,
     _li,
-    _seq, _sgem, _sgtm, _sle, _slt, _sne,
+    _seq, _sge, _sgt, _sle, _slt, _sne,
     _b, _beq, _bne, _bge, _ble, _bgt, _blt, _beqz, _bnez, _blez, _bgez, _bgtz, _bltz, _j, _jr, _jal, _jalr,
     _la, _lb, _lh, _lw,
     _sb, _sh, _sw,

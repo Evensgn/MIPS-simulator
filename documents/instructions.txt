@@ -1,25 +1,38 @@
-add
-addu
-addiu
-sub
-subu
-xor
-xoru
-neg
-negu
-rem
-remu
-mul
-mulu
-div
-divu
-mul(2)
-mulu(2)
-div(2)
-divu(2)
-li
-seq
-sgem
+add rd rs rt
+add rd rs const
+addu rd rs rt
+addu rd rs const
+addiu rd rs const
+sub rd rs rt
+sub rd rs const
+subu rd rs rt
+subu rd rs const
+mul rd rs rt
+mul rd rs const
+mulu rd rs rt
+mulu rd rs const
+mul rs rt
+mulu rs rt
+div rd rs rt
+div rd rs const
+divu rd rs rt
+divu rd rs const
+div rs rt
+divu rs rt
+xor rd rs rt
+xor rd rs const
+xoru rd rs rt
+xoru rd rs const
+neg rd rs
+negu rd rs
+rem rd rs rt
+rem rd rs const
+remu rd rs rt
+remu rd re const
+li rd const
+seq rd rs rt
+seq rd rs const
+sgem rd 
 sgtm
 sle
 slt

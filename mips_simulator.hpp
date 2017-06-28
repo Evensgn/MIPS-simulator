@@ -104,8 +104,167 @@ private:
         registerIdx["$hi"] = 33;
     }
     
-    MIPS_Simulator() = default;
-
+    Instruction EntryToInstruction(const Entry &entry) {
+        switch (entry.tokenType) {
+        case _add:
+            break;
+        
+        case _addu:
+            break;
+        
+        case _addiu:
+            break;
+        
+        case _sub:
+            break;
+        
+        case _subu:
+            break;
+        
+        case _xor:
+            break;
+        
+        case _xoru:
+            break;
+        
+        case _neg:
+            break;
+        
+        case _negu:
+            break;
+        
+        case _rem:
+            break;
+        
+        case _remu:
+            break;
+        
+        case _mul:
+            break;
+        
+        case _mulu:
+            break;
+        
+        case _div:
+            break;
+        
+        case _divu:
+            break;
+        
+        case _li:
+            break;
+        
+        case _seq:
+            break;
+        
+        case _sgem:
+            break;
+        
+        case _sgtm:
+            break;
+        
+        case _sle:
+            break;
+        
+        case _slt:
+            break;
+        
+        case _sne:
+            break;
+        
+        case _b:
+            break;
+        
+        case _beq:
+            break;
+        
+        case _bne:
+            break;
+        
+        case _bge:
+            break;
+        
+        case _ble:
+            break;
+        
+        case _bgt:
+            break;
+        
+        case _blt:
+            break;
+        
+        case _beqz:
+            break;
+        
+        case _bnez:
+            break;
+        
+        case _blez:
+            break;
+        
+        case _bgez:
+            break;
+        
+        case _bgtz:
+            break;
+        
+        case _bltz:
+            break;
+        
+        case _j:
+            break;
+        
+        case _jr:
+            break;
+        
+        case _jal:
+            break;
+        
+        case _jalr:
+            break;
+        
+        case _la:
+            break;
+        
+        case _lb:
+            break;
+        
+        case _lh:
+            break;
+        
+        case _lw:
+            break;
+        
+        case _sb:
+            break;
+        
+        case _sh:
+            break;
+        
+        case _sw:
+            break;
+        
+        case _move:
+            break;
+        
+        case _mfhi:
+            break;
+        
+        case _mflo:
+            break;
+        
+        case _nop:
+            break;
+        
+        case _syscall:
+            break;        
+        }
+    }
+    
+    MIPS_Simulator();
+    MIPS_Simulator(MIPS_Simulator const&);
+    MIPS_Simulator& operator=(MIPS_Simulator const&);
+    
 public: 
     
     static MIPS_Simulator& instance() {

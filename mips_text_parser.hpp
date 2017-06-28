@@ -6,7 +6,8 @@
 using namespace std;
 
 class MIPS_Text_Parser {
-    friend class Entry;
+    class Entry;
+    friend class MIPS_Text_Parser::Entry;
     friend class MIPS_Simulator;
 private:
     map<string, TokenType> _tokenType;
@@ -37,8 +38,8 @@ private:
         _tokenType["divu"] = _divu;
         _tokenType["li"] = _li;
         _tokenType["seq"] = _seq;
-        _tokenType["sgem"] = _sgem;
-        _tokenType["sgtm"] = _sgtm;
+        _tokenType["sge"] = _sge;
+        _tokenType["sgt"] = _sgt;
         _tokenType["sle"] = _sle;
         _tokenType["slt"] = _slt;
         _tokenType["sne"] = _sne;
@@ -134,6 +135,7 @@ private:
     // split each entry into [tokenType, arg0, arg1, ...]
     class Entry {
         friend class MIPS_Text_Parser;
+        friend class MIPS_Simulator;
     private:
         TokenType tokenType;
         EntryType entryType;
@@ -170,7 +172,9 @@ private:
         }
     };
     
-    MIPS_Text_Parser() = default;
+    MIPS_Text_Parser();
+    MIPS_Text_Parser(MIPS_Text_Parser const&);
+    MIPS_Text_Parser& operator=(MIPS_Text_Parser const&);
     
 public:
     static MIPS_Text_Parser& instance() {
