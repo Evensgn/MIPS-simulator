@@ -1,68 +1,51 @@
-add rd rs rt
-add rd rs const
-addu rd rs rt
-addu rd rs const
+add rd rs rt / add rd rs const
+addu rd rs rt / addu rd rs const
 addiu rd rs const
-sub rd rs rt
-sub rd rs const
-subu rd rs rt
-subu rd rs const
-mul rd rs rt
-mul rd rs const
-mulu rd rs rt
-mulu rd rs const
-mul rs rt
-mulu rs rt
-div rd rs rt
-div rd rs const
-divu rd rs rt
-divu rd rs const
-div rs rt
-divu rs rt
-xor rd rs rt
-xor rd rs const
-xoru rd rs rt
-xoru rd rs const
+sub rd rs rt / sub rd rs const
+subu rd rs rt / subu rd rs const
+mul rd rs rt / mul rd rs const / mul rs rt 
+mulu rd rs rt / mulu rd rs const / mulu rs rt
+div rd rs rt / div rd rs const / div rs rt
+divu rd rs rt / divu rd rs const / divu rs rt
+xor rd rs rt / xor rd rs const
+xoru rd rs rt / xoru rd rs const
 neg rd rs
 negu rd rs
-rem rd rs rt
-rem rd rs const
-remu rd rs rt
-remu rd re const
+rem rd rs rt / rem rd rs const
+remu rd rs rt / remu rd re const
 li rd const
-seq rd rs rt
-seq rd rs const
-sgem rd 
-sgtm
-sle
-slt
-sne
-b
-beq
-bne
-bge
-ble
-bgt
-blt
-beqz
-bnez
-blez
-bgez
-bgtz
-bltz
-j
-jr
-jal
-jalr
-la
-lb
-lh
-lw
-sb
-sh
-sw
-move
-mfhi
-mflo
+seq rd rs rt / seq rd rs const
+sge rd rs rt / sge rd rs const
+sgt rd rs rt / sgt rd rs const
+sle rd rs rt / sle rd rs const
+slt rd rs rt / slt rd rs const
+sne rd rs rt / sne rd rs const
+b addr
+beq rs rt addr / beq rs const addr
+bne rs rt addr / bne rs const addr
+bge rs rt addr / bge rs const addr
+ble rs rt addr / ble rs const addr
+bgt rs rt addr / bgt rs const addr
+blt rs rt addr / blt rs const addr
+beqz rs addr
+bnez rs addr
+blez rs addr
+bgez rs addr
+bgtz rs addr
+bltz rs addr
+j addr
+jr rs
+jal addr
+jalr rs
+la rd addr / la rd rt offset
+lb rd addr / lb rd rt offset
+lh rd addr / lh rd rt offset
+lw rd addr / lw rd rt offset
+sb rs addr / sb rs rt offset
+sh rs addr / sh rs rt offset
+sw rs addr / sw rs rt offset
+move rd rs
+mfhi rd
+mflo rd
 nop
-syscall
+syscall (1 / 4 / 5 / 8 / 9 / 10 / 17)

@@ -107,11 +107,11 @@ private:
     Instruction EntryToInstruction(const Entry &entry) {
         switch (entry.tokenType) {
         case _add:
+            
             break;
-        
         case _addu:
+            
             break;
-        
         case _addiu:
             break;
         
@@ -157,10 +157,10 @@ private:
         case _seq:
             break;
         
-        case _sgem:
+        case _sge:
             break;
         
-        case _sgtm:
+        case _sgt:
             break;
         
         case _sle:
@@ -286,11 +286,11 @@ public:
     void ProcessMIPSText(const string &str) {
         mipsText = str;
         entries = MIPS_Text_Parser::instance().SplitToEntries(mipsText);
-        // process instructions
+        // get instruction address
         for (size_t i = 0; i < entries.size(); ++i) {
             if (entries[i].entryType != dotText || entries[i].tokenType == _label)
                 continue;
-            *(reinterpret_cast<Instruction*>(memorySpace + textMemoryTop)) = EntryToInstruction(entries[i]);
+            labelIdxAddress[entries[i].idx] = textMemoryTop;
             textMemoryTop += sizeof(Instruction);
         }
         staticDataMemoryTop = textMemoryTop;
@@ -298,7 +298,16 @@ public:
         for (size_t i = 0; i < entries.size(); ++i) {
             if (entries[i].entryType != dotData || entries[i].tokenType == _label)
                 continue;
+            labelIdxAddress[entries[i].idx] = staticDataMemoryTop;
             
+        }
+        dynamicDataMemoryTop = staticDataMemoryTop;
+        textMemoryTop = 0;
+        // process instructions
+        for (size_t i = 0; i < entries.size(); ++i) {
+            if (entries[i].entryType != dotText || entries[i].tokenType == _label)
+                continue;
+            *(reinterpret_cast<Instruction*>(memorySpace + textMemoryTop)) = EntryToInstruction(entries[i]);
         }
     }
     

@@ -32,7 +32,9 @@ In order to store instructions (within the specified instruction subset) in memo
     <th> rs </th>
     <th> rt </th>
     <th> rd </th>
-    <th> constant or address </th>
+    <th> constant </th>
+    <th> offset </th>
+    <th> address </th>
     <th> total </th>
   </tr>
   <tr>
@@ -41,8 +43,10 @@ In order to store instructions (within the specified instruction subset) in memo
     <td> 1 byte </td>
     <td> 1 byte </td>
     <td> 4 byte </td>
-    <td> 8 byte </td>
+    <td> 4 byte </td>
+    <td> 4 byte </td>
+    <td> 16 byte </td>
   </tr>
 </table>
 
-Each instruction is stored in memory as 8 byte of binary digits.
+Each instruction is stored in memory as 16 byte of binary digits.

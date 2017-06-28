@@ -25,7 +25,7 @@ enum TokenType {
 class Instruction {
 public:
     byte op, rs, rt, rd;
-    int const_addr;
+    int constant, offset, address;
 };
 
 #endif // GLOBAL_CLASS_HPP
