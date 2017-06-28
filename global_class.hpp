@@ -1,6 +1,10 @@
 #ifndef GLOBAL_CLASS_HPP
 #define GLOBAL_CLASS_HPP
 
+#include <vector>
+
+using namespace std;
+
 typedef unsigned char byte;
 
 enum EntryType {
@@ -22,10 +26,26 @@ enum TokenType {
     _nop, _syscall
 };
 
+class Entry {
+    friend class MIPS_Text_Parser;
+    friend class MIPS_Simulator;
+    friend class Entry_Processor;
+private:
+    TokenType tokenType;
+    EntryType entryType;
+    vector<string> argv;
+    int idx;
+public:
+    Entry() = default;
+};
+
 class Instruction {
 public:
     byte op, rs, rt, rd;
     int constant, offset, address;
+    Instruction() {
+        rt = -1; // means that src2 is an immediate number
+    }
 };
 
 #endif // GLOBAL_CLASS_HPP

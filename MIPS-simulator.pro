@@ -10,4 +10,5 @@ HEADERS += \
     mips_text_parser.hpp \
     include_define.hpp \
     evensgn_string.hpp \
-    global_class.hpp
+    global_class.hpp \
+    entry_processor.hpp

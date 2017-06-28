@@ -6,8 +6,6 @@
 using namespace std;
 
 class MIPS_Text_Parser {
-    class Entry;
-    friend class MIPS_Text_Parser::Entry;
     friend class MIPS_Simulator;
 private:
     map<string, TokenType> _tokenType;
@@ -133,46 +131,37 @@ private:
     }
     
     // split each entry into [tokenType, arg0, arg1, ...]
-    class Entry {
-        friend class MIPS_Text_Parser;
-        friend class MIPS_Simulator;
-    private:
-        TokenType tokenType;
-        EntryType entryType;
-        vector<string> argv;
-        int idx;
-    public:
-        Entry() = default;
-        Entry(const string &str) {
-            int p1 = MIPS_Text_Parser::instance().JumpToNextToken(str, -1), p2;
-            bool isArg = false;
+    Entry StringToEntry(const string &str) {
+        Entry ret;
+        int p1 = JumpToNextToken(str, -1), p2;
+        bool isArg = false;
 #ifdef DEBUG_ENTRY_SPLIT
-            cout << "[";
+        cout << "[";
 #endif
-            while (p1 < (int)str.length()) {
-                p2 = p1;
-                if (str[p2] == '\'' || str[p2] == '\"') {
-                    p2 = MIPS_Text_Parser::instance().SkipString(str, p2, str[p2]);
-                    ++p1;
-                }
-                else p2 = MIPS_Text_Parser::instance().SkipNonStringToken(str, p2);
-#ifdef DEBUG_ENTRY_SPLIT
-                cout << string(str, p1, p2 - p1) << ", ";
-#endif
-                if (!isArg) {
-                    tokenType = MIPS_Text_Parser::instance().GetTokenType(string(str, p1, p2 - p1));
-                    isArg = true;
-                }
-                else argv.push_back(string(str, p1, p2 - p1));
-                p1 = MIPS_Text_Parser::instance().JumpToNextToken(str, p2);
+        while (p1 < (int)str.length()) {
+            p2 = p1;
+            if (str[p2] == '\'' || str[p2] == '\"') {
+                p2 = SkipString(str, p2, str[p2]);
+                ++p1;
             }
+            else p2 = SkipNonStringToken(str, p2);
 #ifdef DEBUG_ENTRY_SPLIT
-            cout << "]" << endl;
+            cout << string(str, p1, p2 - p1) << ", ";
 #endif
+            if (!isArg) {
+                ret.tokenType = GetTokenType(string(str, p1, p2 - p1));
+                isArg = true;
+            }
+            else ret.argv.push_back(string(str, p1, p2 - p1));
+            p1 = JumpToNextToken(str, p2);
         }
-    };
+#ifdef DEBUG_ENTRY_SPLIT
+        cout << "]" << endl;
+#endif
+        return ret;
+    }
     
-    MIPS_Text_Parser();
+    MIPS_Text_Parser() = default;
     MIPS_Text_Parser(MIPS_Text_Parser const&);
     MIPS_Text_Parser& operator=(MIPS_Text_Parser const&);
     
@@ -183,8 +172,7 @@ public:
     }
     
     // split the whole text into entries
-    vector<Entry> SplitToEntries(const string &str) {
-        vector<Entry> ret;
+    void SplitToEntries(const string &str, vector<Entry> &entries) {
         int p1 = JumpToNextEntry(str, -1), p2;
         while (p1 < (int)str.length()) {
             p2 = p1;
@@ -192,40 +180,39 @@ public:
 #ifdef DEBUG_TEXT_SPLIT
             cout << "Entry: " << string(str, p1, p2 - p1) << endl;
 #endif
-            ret.push_back(Entry(string(str, p1, p2 - p1)));
+            entries.push_back(StringToEntry(string(str, p1, p2 - p1)));
             p1 = JumpToNextEntry(str, p2);
         }
         int nowIdx = 0;
-        for (size_t i = 0; i < ret.size(); ++i) {
-            if (ret[i].tokenType == _label || ret[i].entryType == dotMark) continue;
-            ret[i].idx = nowIdx++;
+        for (size_t i = 0; i < entries.size(); ++i) {
+            if (entries[i].tokenType == _label || entries[i].entryType == dotMark) continue;
+            entries[i].idx = nowIdx++;
         }
-        for (size_t i = ret.size(); i > 0; --i) {
-            if (ret[i - 1].entryType == dotMark) continue;
-            if (ret[i - 1].tokenType == _label)
-                ret[i - 1].idx = nowIdx;
-            else nowIdx = ret[i - 1].idx;
+        for (size_t i = entries.size(); i > 0; --i) {
+            if (entries[i - 1].entryType == dotMark) continue;
+            if (entries[i - 1].tokenType == _label)
+                entries[i - 1].idx = nowIdx;
+            else nowIdx = entries[i - 1].idx;
         }
 #ifdef DEBUG_ENTRY_INDEX
-        for (size_t i = 0; i < ret.size(); ++i)
-            cout << ret[i].idx << endl;
+        for (size_t i = 0; i < entries.size(); ++i)
+            cout << entries[i].idx << endl;
 #endif
         EntryType nowEntryType = dotMark;
-        for (size_t i = 0; i < ret.size(); ++i) {
-            if (ret[i].tokenType == _data) {
-                ret[i].entryType = dotMark;
+        for (size_t i = 0; i < entries.size(); ++i) {
+            if (entries[i].tokenType == _data) {
+                entries[i].entryType = dotMark;
                 nowEntryType = dotData;
             }
-            else if (ret[i].tokenType == _text) {
-                ret[i].entryType = dotMark;
+            else if (entries[i].tokenType == _text) {
+                entries[i].entryType = dotMark;
                 nowEntryType = dotText;
             }
-            else ret[i].entryType = nowEntryType;
+            else entries[i].entryType = nowEntryType;
 #ifdef DEBUG_ENTRY_TYPE
-            cout << "Entry type: " << ret[i].entryType << endl;
+            cout << "Entry type: " << entries[i].entryType << endl;
 #endif
         }
-        return ret;
     }
 };
     
