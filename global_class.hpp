@@ -47,7 +47,10 @@ class Instruction {
 public:
     byte op, rs, rt, rd;
     int constant, offset, address;
-    Instruction() = default;
+    Instruction() {
+        op = rd = rs = rt = byte(255); // default setting
+        constant = offset = address = 0;
+    }
 };
 
 #endif // GLOBAL_CLASS_HPP
