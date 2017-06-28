@@ -4,6 +4,7 @@
 #include "include_define.hpp"
 #include "mips_text_parser.hpp"
 #include "entry_processor.hpp"
+#include "pipeline.hpp"
 
 using namespace std;
 

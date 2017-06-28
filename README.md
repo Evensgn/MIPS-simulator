@@ -12,7 +12,7 @@ This is a course project of PPCA 2017 (MS106), ACM Honors Class, SJTU.
 
 ## Development Log
 
-For my detailed development log, please check [here](Development-Log.md).
+For my detailed development log, please [check it out here](Development-Log.md).
 
 ## Code Structure & Design
 

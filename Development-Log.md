@@ -4,7 +4,7 @@ Zhou Fan (@Evensgn)
 
 **June 26**
 * Learned some preliminary knowledge about MIPS and CPU from the book *Computer Organization and Design*
-* Searched something about `five stage pipiline`
+* Searched something about `five stage pipeline`
 * Designed code/file structure of this project
 * Wrote part of the parser of MIPS text
 
@@ -16,4 +16,4 @@ Zhou Fan (@Evensgn)
 
 **June 28**
 * Finished the entry processor, which stores all instructions into memory and deal with static data memory
-
+* The correctness of static data management remains to be verified later

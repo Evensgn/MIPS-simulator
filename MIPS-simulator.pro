@@ -12,4 +12,5 @@ HEADERS += \
     evensgn_string.hpp \
     global_class.hpp \
     entry_processor.hpp \
-    utility.hpp
+    utility.hpp \
+    pipeline.hpp
