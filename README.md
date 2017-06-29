@@ -26,7 +26,7 @@ For my detailed development log, please [check it out here](Development-Log.md).
 
 ### Instruction Encoding Format
 
-In order to store instructions (within the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format:
+In order to store instructions (within the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format (which is different from standard MIPS intruction encoding):
 
 <table>
   <tr>

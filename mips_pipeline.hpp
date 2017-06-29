@@ -7,22 +7,26 @@ class MIPS_Pipeline {
 private:
     byte *memorySpace;
     Word *registers;
-    int mainLabelAddr;
+    int PC;
+    Instruction inst;
+    bool IF_AVL, ID_AVL, EX_AVL, MEM_AVL, WB_AVL;
+    int registerStatus[registerNum];
     
     void InstructionFetch() {
+        inst = *(reinterpret_cast<Instruction*>(memorySpace + PC));
         
     }
+    
     void InstructionDecode() {
-        
     }
+    
     void Execution() {
-        
     }
+    
     void MemoryAccess() {
-        
     }
+    
     void WriteBack() {
-        
     }
     
     MIPS_Pipeline() = default;
@@ -34,10 +38,12 @@ public:
         return ins;
     }
     
-    void Run(byte *_memorySpace, Word *_registers, const int _mainLabelAddr) {
+    void Run(byte *_memorySpace, Word *_registers, const int mainLabelAddr) {
         memorySpace = _memorySpace;
         registers = _registers;
-        mainLabelAddr = _mainLabelAddr;
+        PC = mainLabelAddr;
+        IF_AVL = ID_AVL = EX_AVL = MEM_AVL = WB_AVL = true;
+        
     }
 };
 
