@@ -19,10 +19,10 @@ For my detailed development log, please [check it out here](Development-Log.md).
 ### Main Classes
 
 **classes of singleton design pattern:**
-* MIPS_Simulator: Core of the whole simulator
-* MIPS_Text_Parser: Parse the MIPS text into entries
-* MIPS_Entry_Processor: Process entries, store instruction in memory and manage static data
-* MIPS_Pipeline: Pipeline to execute MIPS instructions
+* `MIPS_Simulator`: Core of the whole simulator
+* `MIPS_Text_Parser`: Parse the MIPS text into entries
+* `MIPS_Entry_Processor`: Process entries, store instruction in memory and manage static data
+* `MIPS_Pipeline`: Pipeline to execute MIPS instructions
 
 ### Instruction Encoding Format
 
@@ -67,6 +67,6 @@ The default value of `rd`, `rs` and `rt` is 255 so that:
 * Writeback (WB): update register value
 
 ## References
-* The book *Computer Organization and Design, The Hardware/Software Interface, Third Edition*
+* *Computer Organization and Design, The Hardware/Software Interface, Third Edition*
 * [Tutorial about pipeline, Iowa State University](https://web.cs.iastate.edu/~prabhu/Tutorial/PIPELINE/dataHaz.html#example)
 * [MIPS Pipeline, Hakim Weatherspoon, Cornell University, 2012](http://www.cs.cornell.edu/courses/cs3410/2012sp/lecture/09-pipelined-cpu-i-g.pdf)
