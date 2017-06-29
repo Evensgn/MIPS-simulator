@@ -21,4 +21,4 @@ Zhou Fan (@Evensgn)
 **June 29**
 * Learned forwarding, a method to avoid stalling in "read after write" case of data hazard
 * Learned about `union` from our TA Sidi, and started using it to manage binary data in memory
-* Started writing the pipeline
+* Started writing the pipeline part

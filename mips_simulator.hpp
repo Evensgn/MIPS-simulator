@@ -12,9 +12,10 @@ class MIPS_Simulator {
 private:
     // memory management
     int textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop;
+    int mainLabelAddr;
     
     // registers and memory space
-    unsigned int registers[registerNum];
+    Word registers[registerNum];
     byte memorySpace[maxMemoryByte];
     
     // mips source text
@@ -22,7 +23,7 @@ private:
     
     vector<Entry> entries;
     
-    unsigned int &reg(const string regName) {
+    Word &reg(const string regName) {
 #ifdef DEBUG_REGISTER_NAME
         if (MIPS_Entry_Processor::instance().registerIdx.find(regName) == MIPS_Entry_Processor::instance().registerIdx.end()) {
             cout << "Invalid register name: " << regName << endl;
@@ -57,7 +58,7 @@ public:
     void ProcessMIPSText(const string &str) {
         mipsText = str;
         MIPS_Text_Parser::instance().SplitToEntries(mipsText, entries);
-        MIPS_Entry_Processor::instance().ProcessEntries(entries, memorySpace, textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop);
+        MIPS_Entry_Processor::instance().ProcessEntries(entries, memorySpace, textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop, mainLabelAddr);
     }
 };
 

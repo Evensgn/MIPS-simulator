@@ -19,10 +19,10 @@ For my detailed development log, please [check it out here](Development-Log.md).
 ### Main Classes
 
 **classes of singleton design pattern:**
-* `MIPS_Simulator`: Core of the whole simulator
-* `MIPS_Text_Parser`: Parse the MIPS text into entries
-* `MIPS_Entry_Processor`: Process entries, store instruction in memory and manage static data
-* `MIPS_Pipeline`: Pipeline to execute MIPS instructions
+* `MIPS_Simulator` : Core of the whole simulator
+* `MIPS_Text_Parser` : Parse the MIPS text into entries
+* `MIPS_Entry_Processor` : Process entries, store instruction in memory and manage static data
+* `MIPS_Pipeline` : Pipeline to execute MIPS instructions
 
 ### Instruction Encoding Format
 
@@ -60,11 +60,11 @@ The default value of `rd`, `rs` and `rt` is 255 so that:
 ### Five Stage Pipeline
 
 #### Stages
-* Instruction Fetch (IF): get instruction (binary code) from memory
-* Instruction Decode (ID): translate binary code into instruction and read involved registers
-* Execute (EX): perform calculation operation, compute address
-* Memory (MEM): access memory if needed
-* Writeback (WB): update register value
+* **Instruction Fetch (IF)** : get instruction (binary code) from memory
+* **Instruction Decode (ID)** : translate binary code into instruction and read involved registers
+* **Execution (EX)** : perform calculation operation, compute address
+* **Memory Access (MEM)** : access memory if needed
+* **Write Back (WB)** : update register value
 
 ## References
 * *Computer Organization and Design, The Hardware/Software Interface, Third Edition*

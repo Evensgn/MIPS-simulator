@@ -251,7 +251,7 @@ public:
         return ins;
     }
 
-    void ProcessEntries(const vector<Entry> &entries, byte* memorySpace, int &textMemoryTop, int &staticDataMemoryTop, int &dynamicDataMemoryTop) {
+    void ProcessEntries(const vector<Entry> &entries, byte* memorySpace, int &textMemoryTop, int &staticDataMemoryTop, int &dynamicDataMemoryTop, int &mainLabelAddr) {
         // get instruction address
         for (size_t i = 0; i < entries.size(); ++i) {
             if (entries[i].tokenType == _label) {
@@ -270,6 +270,7 @@ public:
             labelIdxAddress[entries[i].idx] = staticDataMemoryTop;
             ProcessDataEntry(entries[i], memorySpace, staticDataMemoryTop);
         }
+        mainLabelAddr = labelIdxAddress[labelNameIdx["main"]];
         dynamicDataMemoryTop = staticDataMemoryTop;
         textMemoryTop = 0;
         // process instructions
