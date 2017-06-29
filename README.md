@@ -65,3 +65,8 @@ The default value of `rd`, `rs` and `rt` is 255 so that:
 * Execute (EX): perform calculation operation, compute address
 * Memory (MEM): access memory if needed
 * Writeback (WB): update register value
+
+## References
+* The book *Computer Organization and Design, The Hardware/Software Interface, Third Edition*
+* (Tutorial about pipeline, Iowa State University)[https://web.cs.iastate.edu/~prabhu/Tutorial/PIPELINE/dataHaz.html#example]
+* (MIPS Pipeline, Hakim Weatherspoon, Cornell University, 2012)[http://www.cs.cornell.edu/courses/cs3410/2012sp/lecture/09-pipelined-cpu-i-g.pdf]
