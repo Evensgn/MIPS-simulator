@@ -178,8 +178,8 @@ private:
         }
 #ifdef DEBUG_ENTRY_TO_INSTRUCTION
         cout << "Instruction: [" << int(ret.op) << ", " << int(ret.rs) \
-             << ", " << int(ret.rt) << ", " << int(ret.rd) << ", " << int(ret.constant) \
-             << ", " << int(ret.offset) << ", " << int(ret.address) << "]" << endl; 
+             << ", " << int(ret.rt) << ", " << int(ret.rd) << ", " << ret.constant.i \
+             << ", " << ret.offset.i << ", " << ret.address.i << "]" << endl; 
 #endif
         return ret;
     }
@@ -194,45 +194,47 @@ private:
                 memorySpace[staticDataMemoryTop++] = byte(0);    
             break;
         case _ascii:
-            for (size_t i = 0; i < entry.argv[0].length(); ++i) {
-                *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = \
-                    entry.argv[0].at(i);
-                staticDataMemoryTop += sizeof(char);            
-            }
+            for (size_t i = 0; i < entry.argv[0].length(); ++i)
+                memorySpace[staticDataMemoryTop++] = byte(entry.argv[0].at(i));
             break;
         case _asciiz:
-            for (size_t i = 0; i < entry.argv[0].length(); ++i) {
-                *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = \
-                    entry.argv[0].at(i);
-                staticDataMemoryTop += sizeof(char);            
-            }
-            *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = '\0';
-            staticDataMemoryTop += sizeof(char);
+            for (size_t i = 0; i < entry.argv[0].length(); ++i)
+                memorySpace[staticDataMemoryTop++] = byte(entry.argv[0].at(i));
+            memorySpace[staticDataMemoryTop++] = byte('\0');
             break;
         case _byte:
-        case _half:
-        case _word:
             for (size_t i = 0; i < entry.argv.size(); ++i) {
-                if (entry.argv[i].at(0) == '\'') 
-                    *(reinterpret_cast<char*>(memorySpace + staticDataMemoryTop)) = \
-                        DecodeEscapedString(string(entry.argv[i], 1, entry.argv[i].length() - 2)).at(0);
+                byte bt;
+                if (entry.argv[i].at(0) == '\'')
+                    bt = byte(DecodeEscapedString(string(entry.argv[i], 1, entry.argv[i].length() - 2)).at(0));
                 else
-                    *(reinterpret_cast<int*>(memorySpace + staticDataMemoryTop)) = \
-                        StringToInteger(entry.argv[i]);
-                switch (entry.tokenType) {
-                case _byte:
-                    staticDataMemoryTop += 1;
-                    break;
-                case _half:
-                    staticDataMemoryTop += 2;
-                    break;
-                case _word:
-                    staticDataMemoryTop += 4;
-                    break;
-                default: break;
-                }
+                    bt = byte(StringToInteger(entry.argv[i]));
+                memorySpace[staticDataMemoryTop++] = bt;
             }
             break;
+        case _half:
+            for (size_t i = 0; i < entry.argv.size(); ++i) {
+                Half hf;
+                if (entry.argv[i].at(0) == '\'')
+                    hf = Half((unsigned short)(DecodeEscapedString(string(entry.argv[i], 1, entry.argv[i].length() - 2)).at(0)));
+                else
+                    hf = Half((short)StringToInteger(entry.argv[i])); 
+                memorySpace[staticDataMemoryTop++] = hf.b0; 
+                memorySpace[staticDataMemoryTop++] = hf.b1;
+            }
+            break;
+        case _word:
+            for (size_t i = 0; i < entry.argv.size(); ++i) {
+                Word wd;
+                if (entry.argv[i].at(0) == '\'')
+                    wd = Word((unsigned int)(DecodeEscapedString(string(entry.argv[i], 1, entry.argv[i].length() - 2)).at(0)));
+                else
+                    wd = Word((int)StringToInteger(entry.argv[i])); 
+                memorySpace[staticDataMemoryTop++] = wd.b0; 
+                memorySpace[staticDataMemoryTop++] = wd.b1; 
+                memorySpace[staticDataMemoryTop++] = wd.b2; 
+                memorySpace[staticDataMemoryTop++] = wd.b3;
+            }
         case _space:
             staticDataMemoryTop += StringToInteger(entry.argv[0]);
             break;
@@ -275,7 +277,20 @@ public:
             if (entries[i].entryType != dotText || entries[i].tokenType == _label)
                 continue;
             *(reinterpret_cast<Instruction*>(memorySpace + textMemoryTop)) = EntryToInstruction(entries[i]);
+            textMemoryTop += sizeof(Instruction);
         }
+#ifdef DEBUG_STORE_INSTRUCTION
+        cout << "DEBUG_STORE_INSTRUCTION" << endl;
+        int pos = 0;
+        Instruction ins;
+        while (pos != textMemoryTop) {
+            ins = *(reinterpret_cast<Instruction*>(memorySpace + pos));
+            pos += sizeof(Instruction);
+            cout << "Instruction: [" << int(ins.op) << ", " << int(ins.rs) \
+                 << ", " << int(ins.rt) << ", " << int(ins.rd) << ", " << ins.constant.i \
+                 << ", " << ins.offset.i << ", " << ins.address.i << "]" << endl; 
+        }
+#endif
     }
 };
 

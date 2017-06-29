@@ -9,7 +9,7 @@ Zhou Fan (@Evensgn)
 * Wrote part of the parser of MIPS text
 
 **June 27**
-* Learned something about MIPS memory organization and solutions to hazards
+* Learned something about MIPS memory organization and different hazards
 * Changed three classes into singleton design pattern, taking the advice of Yunwei
 * Designed instruction encoding format
 * Finished the parser
@@ -17,3 +17,7 @@ Zhou Fan (@Evensgn)
 **June 28**
 * Finished the entry processor, which stores all instructions into memory and deal with static data memory
 * The correctness of static data management remains to be verified later
+
+**June 29**
+* Learned forwarding, a method to avoid stalling in some case of data hazard
+* Learned about `union` from our TA Sidi, and started using it to manage binary data in memory

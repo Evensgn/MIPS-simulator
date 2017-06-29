@@ -39,18 +39,18 @@ In order to store instructions (within the specified instruction subset) in memo
     <th> total </th>
   </tr>
   <tr>
-    <td> 1 byte </td>
-    <td> 1 byte </td>
-    <td> 1 byte </td>
-    <td> 1 byte </td>
-    <td> 4 byte </td>
-    <td> 4 byte </td>
-    <td> 4 byte </td>
-    <td> 16 byte </td>
+    <td> 1 bytes </td>
+    <td> 1 bytes </td>
+    <td> 1 bytes </td>
+    <td> 1 bytes </td>
+    <td> 4 bytes </td>
+    <td> 4 bytes </td>
+    <td> 4 bytes </td>
+    <td> 16 bytes </td>
   </tr>
 </table>
 
-Each instruction is stored in memory as 16 byte of binary digits.
+Each instruction is stored in memory as 16 bytes of binary digits.
 
 The default value of `rd`, `rs` and `rt` is 255 so that:
 * In some instructions, `Src2` may either be a register `rt` or an immediate number `constant`, and if `Scr2` is `constant`, `rt == 255`.
