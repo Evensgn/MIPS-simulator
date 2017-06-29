@@ -3,8 +3,8 @@
 
 #include "include_define.hpp"
 #include "mips_text_parser.hpp"
-#include "entry_processor.hpp"
-#include "pipeline.hpp"
+#include "mips_entry_processor.hpp"
+#include "mips_pipeline.hpp"
 
 using namespace std;
 
@@ -24,12 +24,12 @@ private:
     
     unsigned int &reg(const string regName) {
 #ifdef DEBUG_REGISTER_NAME
-        if (Entry_Processor::instance().registerIdx.find(regName) == Entry_Processor::instance().registerIdx.end()) {
+        if (MIPS_Entry_Processor::instance().registerIdx.find(regName) == MIPS_Entry_Processor::instance().registerIdx.end()) {
             cout << "Invalid register name: " << regName << endl;
             system("pause");
         }
 #endif
-        return registers[Entry_Processor::instance().registerIdx[regName]];
+        return registers[MIPS_Entry_Processor::instance().registerIdx[regName]];
     }
     
     MIPS_Simulator() = default;
@@ -44,7 +44,7 @@ public:
     }
     
     void SimulatorInit() {
-        Entry_Processor::instance().RegisterIdxInit();
+        MIPS_Entry_Processor::instance().RegisterIdxInit();
         MIPS_Text_Parser::instance().TokenTypeInit();
         reg("$sp") = maxMemoryByte;
         textMemoryTop = 0;
@@ -57,7 +57,7 @@ public:
     void ProcessMIPSText(const string &str) {
         mipsText = str;
         MIPS_Text_Parser::instance().SplitToEntries(mipsText, entries);
-        Entry_Processor::instance().ProcessEntries(entries, memorySpace, textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop);
+        MIPS_Entry_Processor::instance().ProcessEntries(entries, memorySpace, textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop);
     }
 };
 

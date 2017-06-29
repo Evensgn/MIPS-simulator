@@ -11,6 +11,6 @@ HEADERS += \
     include_define.hpp \
     evensgn_string.hpp \
     global_class.hpp \
-    entry_processor.hpp \
     utility.hpp \
-    mips_pipeline.hpp
+    mips_pipeline.hpp \
+    mips_entry_processor.hpp

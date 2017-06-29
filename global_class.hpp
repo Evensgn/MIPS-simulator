@@ -69,7 +69,7 @@ enum TokenType {
 class Entry {
     friend class MIPS_Text_Parser;
     friend class MIPS_Simulator;
-    friend class Entry_Processor;
+    friend class MIPS_Entry_Processor;
 private:
     TokenType tokenType;
     EntryType entryType;

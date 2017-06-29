@@ -1,11 +1,11 @@
-#ifndef ENTRY_PROCESSOR_HPP
-#define ENTRY_PROCESSOR_HPP
+#ifndef MIPS_ENTRY_PROCESSOR_HPP
+#define MIPS_ENTRY_PROCESSOR_HPP
 
 #include "include_define.hpp"
 
 using namespace std;
 
-class Entry_Processor {
+class MIPS_Entry_Processor {
     friend class MIPS_Simulator;
 private:
     map<string, int> registerIdx, labelNameIdx;
@@ -242,12 +242,12 @@ private:
         }
     }
     
-    Entry_Processor() = default;
-    Entry_Processor(Entry_Processor const&);
-    Entry_Processor& operator=(Entry_Processor const&);
+    MIPS_Entry_Processor() = default;
+    MIPS_Entry_Processor(MIPS_Entry_Processor const&);
+    MIPS_Entry_Processor& operator=(MIPS_Entry_Processor const&);
 public:
-    static Entry_Processor& instance() {
-        static Entry_Processor ins;
+    static MIPS_Entry_Processor& instance() {
+        static MIPS_Entry_Processor ins;
         return ins;
     }
 
@@ -294,4 +294,4 @@ public:
     }
 };
 
-#endif // ENTRY_PROCESSOR_HPP
+#endif // MIPS_ENTRY_PROCESSOR_HPP
