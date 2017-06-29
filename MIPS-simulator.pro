@@ -13,4 +13,4 @@ HEADERS += \
     global_class.hpp \
     entry_processor.hpp \
     utility.hpp \
-    pipeline.hpp
+    mips_pipeline.hpp

@@ -19,5 +19,5 @@ Zhou Fan (@Evensgn)
 * The correctness of static data management remains to be verified later
 
 **June 29**
-* Learned forwarding, a method to avoid stalling in some case of data hazard
+* Learned forwarding, a method to avoid stalling in "read after write" case of data hazard
 * Learned about `union` from our TA Sidi, and started using it to manage binary data in memory
