@@ -90,4 +90,20 @@ public:
     }
 };
 
+class BinaryInst {
+public:
+    byte b[16];
+};
+
+class InstInfo {
+public:
+    TokenType instType;
+    byte rd;
+    Word rsv, rtv, constant, offset, address, v0, a0;
+    bool rse, rte, rde;
+    InstInfo() {
+        rse = rte = rde = false;
+    }
+};
+
 #endif // GLOBAL_CLASS_HPP

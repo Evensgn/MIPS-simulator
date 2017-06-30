@@ -8,19 +8,126 @@ private:
     byte *memorySpace;
     Word *registers;
     int PC;
-    Instruction inst;
+    int textMemoryTop;
+    bool finished, exited, PC_pending;
     bool IF_AVL, ID_AVL, EX_AVL, MEM_AVL, WB_AVL;
+    bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
     int registerStatus[registerNum];
+    struct {
+        bool spare;
+        BinaryInst binaryInst;
+        int nextInstAddr;
+    } IF_ID;
+    struct {
+        bool spare;
+        InstInfo instInfo;
+        int nextInstAddr;
+    } ID_EX;
+    struct {
+        
+    } EX_MEM;
+    struct {
+        
+    } MEM_WB;
     
     void InstructionFetch() {
-        inst = *(reinterpret_cast<Instruction*>(memorySpace + PC));
-        
+        if (ID_STA || PC_pending) {
+            IF_STA = true;
+            return;
+        }
+        if (PC == textMemoryTop) {
+            finished = true;
+            return;
+        }
+        BinaryInst _binaryInst; 
+        _binaryInst = *(reinterpret_cast<BinaryInst*>(memorySpace + PC));
+        IF_ID.binaryInst = _binaryInst;
+        IF_ID.nextInstAddr = PC + sizeof(BinaryInst);
+        IF_ID.spare = false;
+        IF_STA = false;
     }
     
     void InstructionDecode() {
+        if (IF_ID.spare) return;
+        if (EX_STA) {
+            ID_STA = true;
+            return;
+        }
+        Instruction inst;
+        inst = *(reinterpret_cast<Instruction*>(&(IF_ID.binaryInst)));
+        InstInfo _instInfo;
+        _instInfo.instType = TokenType(inst.op);
+        _instInfo.constant = inst.constant;
+        _instInfo.offset = inst.offset;
+        _instInfo.address = inst.address;
+        if (inst.rs != byte(255)) {
+            // register is to be written
+            if (registerStatus[inst.rs] != 0) {
+                ID_STA = true;
+                return;
+            }
+            _instInfo.rsv = registers[inst.rs];
+            _instInfo.rse = true;
+        }
+        if (inst.rt != byte(255)) {
+            // register is to be written
+            if (registerStatus[inst.rt] != 0) {
+                ID_STA = true;
+                return;
+            }
+            _instInfo.rtv = registers[inst.rt];
+            _instInfo.rte = true;
+        }
+        if (_instInfo.instType == _mflo) {
+            if (registerStatus[32] != 0) {
+                ID_STA = true;
+                return;
+            }
+            _instInfo.rsv = registers[32];
+            _instInfo.rse = true;
+        }
+        if (_instInfo.instType == _mfhi) {
+            if (registerStatus[33] != 0) {
+                ID_STA = true;
+                return;
+            }
+            _instInfo.rsv = registers[33];
+            _instInfo.rse = true;
+        }
+        if (_instInfo.instType == _syscall) {
+            
+        }
+        
+        if (inst.rd != byte(255)) {
+            _instInfo.rd = inst.rd;
+            ++(registerStatus[rd]);
+        }
+        if (InClosedInterval(_instInfo.instType, _mul, _divu) && inst.rd == byte(255)) {
+            ++(registerStatus[32]);
+            ++(registerStatus[33]);
+        }
+        
+        if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
+            PC_pending = true;
+        }
+        else if (InClosedInterval(_instInfo.instType, _j, _jalr)) {
+            PC = _instInfo.address;
+            PC_pending = false;
+        }
+        else {
+            PC += sizeof(BinaryInst);
+            PC_pending = false;
+        }
+        
+        ID_EX.instInfo = _instInfo;
+        ID_EX.nextInstAddr = IF_ID.nextInstAddr;
+        ID_EX.spare = false;
+        ID_STA = false;
+        IF_ID.spare = true;
     }
     
     void Execution() {
+        
     }
     
     void MemoryAccess() {
@@ -38,12 +145,25 @@ public:
         return ins;
     }
     
-    void Run(byte *_memorySpace, Word *_registers, const int mainLabelAddr) {
+    void Run(byte *_memorySpace, Word *_registers, const int _textMemoryTop, const int mainLabelAddr) {
         memorySpace = _memorySpace;
         registers = _registers;
-        PC = mainLabelAddr;
         IF_AVL = ID_AVL = EX_AVL = MEM_AVL = WB_AVL = true;
+        IF_STA = ID_STA = EX_STA = MEM_STA = WB_STA = false;
+        IF_ID.spare = ID_EX.spare = EX_MEM.spare = MEM_WB.spare = true;
+        finished = false;
+        textMemoryTop = _textMemoryTop;
+        PC = mainLabelAddr;
+        for (int i = 0; i < registerNum; ++i)
+            registerStatus[i] = 0;
         
+        while (!finished && !exited) {
+            WriteBack();
+            MemoryAccess();
+            Execution();
+            InstructionDecode();
+            InstructionFetch();
+        }
     }
 };
 
