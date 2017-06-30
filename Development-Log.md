@@ -22,3 +22,8 @@ Zhou Fan (@Evensgn)
 * Learned forwarding, a method to avoid stalling in "read after write" case of data hazard
 * Learned about `union` from our TA Sidi, and started using it to manage binary data in memory
 * Started writing the pipeline part
+
+**June 30**
+* Designed the code pattern of pipeline
+* Wrote the `Instruction Fetch` stage
+* Wrote the `Instruction Decode` stage

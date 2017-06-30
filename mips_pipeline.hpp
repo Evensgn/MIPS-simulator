@@ -86,7 +86,7 @@ private:
             _instInfo.rsv = registers[32];
             _instInfo.rse = true;
         }
-        if (_instInfo.instType == _mfhi) {
+        else if (_instInfo.instType == _mfhi) {
             if (registerStatus[33] != 0) {
                 ID_STA = true;
                 return;
@@ -94,8 +94,30 @@ private:
             _instInfo.rsv = registers[33];
             _instInfo.rse = true;
         }
-        if (_instInfo.instType == _syscall) {
-            
+        else if (_instInfo.instType == _syscall) {
+            // $v0
+            if (registerStatus[2] != 0) { 
+                ID_STA = true;
+                return;
+            }
+            _instInfo.v0 = registers[2];
+            if (_instInfo.v0 == 1 || _instInfo.v0 == 4 || _instInfo.v0 == 8 || \
+                _instInfo.v0 == 9 || _instInfo.v0 == 17) {
+                // $a0
+                if (registerStatus[4] != 0) {
+                    ID_STA = true;
+                    return;
+                }
+                _instInfo.a0 = registers[4];
+            }
+            if (_instInfo.v0 == 8) {
+                // $a1
+                if (registerStatus[5] != 0) {
+                    ID_STA = true;
+                    return;
+                }
+                _instInfo.a1 = registers[5];
+            }
         }
         
         if (inst.rd != byte(255)) {
@@ -105,6 +127,10 @@ private:
         if (InClosedInterval(_instInfo.instType, _mul, _divu) && inst.rd == byte(255)) {
             ++(registerStatus[32]);
             ++(registerStatus[33]);
+        }
+        else if (_instInfo.instType == _syscall && (_instInfo.v0 == 5 || _instInfo.v0 == 9)) {
+            // $v0
+            ++(registerStatus[2]);
         }
         
         if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
