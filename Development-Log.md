@@ -27,3 +27,7 @@ Zhou Fan (@Evensgn)
 * Designed the code pattern of pipeline
 * Wrote the `Instruction Fetch` stage
 * Wrote the `Instruction Decode` stage
+
+**July 1**
+* Wrote the `Execution` stage
+* Wrote the `Memory Access` stage

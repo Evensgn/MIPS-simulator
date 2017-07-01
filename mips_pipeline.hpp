@@ -8,7 +8,7 @@ private:
     byte *memorySpace;
     Word *registers;
     int PC;
-    int textMemoryTop;
+    int textMemoryTop, dynamicMemoryTop;
     bool finished, exited, PC_pending;
     bool IF_AVL, ID_AVL, EX_AVL, MEM_AVL, WB_AVL;
     bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
@@ -353,6 +353,25 @@ private:
         case _sw:
             memorySpace[_instInfo2.address] = _instInfo2.rsv.b0;
             memorySpace[_instInfo2.address + 1] = _instInfo2.rsv.b1;
+            memorySpace[_instInfo2.address + 2] = _instInfo2.rsv.b2;
+            memorySpace[_instInfo2.address + 3] = _instInfo2.rsv.b3;
+            break;
+        case _syscall:
+            switch (_instInfo2.v0) {
+            case 4:
+                
+                break;
+            case 8:
+                break;
+            case 9:
+                while (dynamicMemoryTop % 4 != 0)
+                    ++dynamicMemoryTop;
+                res.i = dynamicMemoryTop;
+                dynamicMemoryTop += _instInfo2.a0;
+                break;
+            default:
+                break;
+            }
             break;
         default:
             break;
@@ -380,7 +399,7 @@ public:
         return ins;
     }
     
-    void Run(byte *_memorySpace, Word *_registers, const int _textMemoryTop, const int mainLabelAddr) {
+    void Run(byte *_memorySpace, Word *_registers, const int _textMemoryTop, int &_dynamicMemoryTop, const int mainLabelAddr) {
         memorySpace = _memorySpace;
         registers = _registers;
         IF_AVL = ID_AVL = EX_AVL = MEM_AVL = WB_AVL = true;
@@ -388,6 +407,7 @@ public:
         IF_ID.spare = ID_EX.spare = EX_MEM.spare = MEM_WB.spare = true;
         finished = false;
         textMemoryTop = _textMemoryTop;
+        dynamicMemoryTop = _dynamicMemoryTop;
         PC = mainLabelAddr;
         for (int i = 0; i < registerNum; ++i)
             registerStatus[i] = 0;
@@ -399,6 +419,8 @@ public:
             InstructionDecode();
             InstructionFetch();
         }
+        
+        _dynamicMemoryTop = dynamicMemoryTop;
     }
 };
 
