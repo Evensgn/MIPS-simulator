@@ -60,6 +60,10 @@ public:
         MIPS_Text_Parser::instance().SplitToEntries(mipsText, entries);
         MIPS_Entry_Processor::instance().ProcessEntries(entries, memorySpace, textMemoryTop, staticDataMemoryTop, dynamicDataMemoryTop, mainLabelAddr);
     }
+    
+    void RunPipeline() {
+        MIPS_Pipeline::instance().Run(memorySpace, registers, textMemoryTop, dynamicDataMemoryTop, mainLabelAddr);
+    }
 };
 
 #endif // MIPS_SIMULATOR_HPP

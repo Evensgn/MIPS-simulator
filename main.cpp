@@ -17,7 +17,8 @@ int main()
     cout << mipsSourceText << endl;
 #endif
     MIPS_Simulator::instance().ProcessMIPSText(mipsSourceText);
-
+    MIPS_Simulator::instance().RunPipeline();
+        
     ifstream inFile("test.in");
     ofstream ansFile("test.ans");
 

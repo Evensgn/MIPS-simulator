@@ -8,7 +8,7 @@ private:
     byte *memorySpace;
     Word *registers;
     int PC;
-    int textMemoryTop, dynamicMemoryTop;
+    int textMemoryTop, dynamicDataMemoryTop;
     bool finished, exited, PC_pending;
     bool IF_AVL, ID_AVL, EX_AVL, MEM_AVL, WB_AVL;
     bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
@@ -28,13 +28,11 @@ private:
         InstInfo2 instInfo2;
         Word res, res0, res1;
         string str;
-        int nextInstAddr;
     } EX_MEM;
     struct {
         bool spare;
         InstInfo2 instInfo2;
         Word res, res0, res1;
-        int nextInstAddr;
     } MEM_WB;
     
     void InstructionFetch() {
@@ -135,6 +133,9 @@ private:
         if (inst.rd != byte(255)) {
             _instInfo.rd = inst.rd;
             ++(registerStatus[inst.rd]);
+        }
+        else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
+            _instInfo.rd = 31;
         }
         if (InClosedInterval(_instInfo.instType, _mul, _divu) && inst.rd == byte(255)) {
             ++(registerStatus[32]);
@@ -266,6 +267,9 @@ private:
                 PC_pending = false;
             }
         }
+        else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
+            res.i = ID_EX.nextInstAddr;
+        }
         else if (InClosedInterval(_instInfo.instType, _la, _sw) && _instInfo.rte) {
             _instInfo.address.i = _instInfo.rtv.i + _instInfo.offset.i;
         }
@@ -314,7 +318,6 @@ private:
         EX_MEM.res = res;
         EX_MEM.res0 = res0;
         EX_MEM.res1 = res1;
-        EX_MEM.nextInstAddr = ID_EX.nextInstAddr;
         EX_MEM.spare = false;
         EX_STA = false;
         ID_EX.spare = true;
@@ -338,30 +341,30 @@ private:
             res = _instInfo2.address;        
             break;
         case _lb:
-            res.b0 = *(memorySpace + _instInfo2.address.i);
+            res.b0 = memorySpace[_instInfo2.address.i];
             break;
-        case _lh:
-            res.b0 = *(memorySpace + _instInfo2.address.i);
-            res.b1 = *(memorySpace + _instInfo2.address.i + 1);
+         case _lh:
+            res.b0 = memorySpace[_instInfo2.address.i];
+            res.b1 = memorySpace[_instInfo2.address.i + 1];
             break;
         case _lw:
-            res.b0 = *(memorySpace + _instInfo2.address.i);
-            res.b1 = *(memorySpace + _instInfo2.address.i + 1);
-            res.b2 = *(memorySpace + _instInfo2.address.i + 2);
-            res.b3 = *(memorySpace + _instInfo2.address.i + 3);
+            res.b0 = memorySpace[_instInfo2.address.i];
+            res.b1 = memorySpace[_instInfo2.address.i + 1];
+            res.b2 = memorySpace[_instInfo2.address.i + 2];
+            res.b3 = memorySpace[_instInfo2.address.i + 3];
             break;
         case _sb:
-            *(memorySpace + _instInfo2.address.i) = _instInfo2.rsv.b0;
+            memorySpace[_instInfo2.address.i] = _instInfo2.rsv.b0;
             break;
         case _sh:
-            *(memorySpace + _instInfo2.address.i) = _instInfo2.rsv.b0;
-            *(memorySpace + _instInfo2.address.i + 1) = _instInfo2.rsv.b1;
-            break;            
+            memorySpace[_instInfo2.address.i] = _instInfo2.rsv.b0;
+            memorySpace[_instInfo2.address.i + 1] = _instInfo2.rsv.b1;
+            break;    
         case _sw:
-            *(memorySpace + _instInfo2.address.i) = _instInfo2.rsv.b0;
-            *(memorySpace + _instInfo2.address.i + 1) = _instInfo2.rsv.b1;
-            *(memorySpace + _instInfo2.address.i + 2) = _instInfo2.rsv.b2;
-            *(memorySpace + _instInfo2.address.i + 3) = _instInfo2.rsv.b3;
+            memorySpace[_instInfo2.address.i] = _instInfo2.rsv.b0;
+            memorySpace[_instInfo2.address.i + 1] = _instInfo2.rsv.b1;
+            memorySpace[_instInfo2.address.i + 2] = _instInfo2.rsv.b2;
+            memorySpace[_instInfo2.address.i + 3] = _instInfo2.rsv.b3;
             break;
         case _syscall:
             switch (_instInfo2.v0.i) {
@@ -381,10 +384,10 @@ private:
                 memorySpace[pos++] = '\0';
                 break;
             case 9:
-                while (dynamicMemoryTop % 4 != 0)
-                    ++dynamicMemoryTop;
-                res.i = dynamicMemoryTop;
-                dynamicMemoryTop += _instInfo2.a0.i;
+                while (dynamicDataMemoryTop % 4 != 0)
+                    ++dynamicDataMemoryTop;
+                res.i = dynamicDataMemoryTop;
+                dynamicDataMemoryTop += _instInfo2.a0.i;
                 break;
             default:
                 break;
@@ -398,7 +401,6 @@ private:
         MEM_WB.res = res;
         MEM_WB.res0 = EX_MEM.res0;
         MEM_WB.res1 = EX_MEM.res1;
-        MEM_WB.nextInstAddr = EX_MEM.nextInstAddr;
         MEM_WB.spare = false;
         MEM_STA = false;
         EX_MEM.spare = true;
@@ -408,7 +410,24 @@ private:
         if (finished || exited) return;
         if (MEM_WB.spare) return;
         
-        
+        InstInfo2 _instInfo2 = MEM_WB.instInfo2;
+        if (_instInfo2.rd != byte(255)) {
+            if (InClosedInterval(_instInfo2.instType, _move, _mflo)) 
+                registers[_instInfo2.rd] = _instInfo2.rsv;
+            else registers[_instInfo2.rd] = MEM_WB.res;
+            --(registerStatus[_instInfo2.rd]);
+        }
+        else if (InClosedInterval(_instInfo2.instType, _mul, _divu) && _instInfo2.rd == byte(255)) {
+            registers[32] = MEM_WB.res0;
+            registers[33] = MEM_WB.res1;
+            --(registerStatus[32]);
+            --(registerStatus[33]);
+        }
+        else if (_instInfo2.instType == _syscall && (_instInfo2.v0.i == 5 || _instInfo2.v0.i == 9)) {
+            // $v0
+            registers[2] = MEM_WB.res;
+            --(registerStatus[2]);
+        }
         
         WB_STA = false;
         MEM_WB.spare = true;
@@ -423,7 +442,7 @@ public:
         return ins;
     }
     
-    void Run(byte *_memorySpace, Word *_registers, const int _textMemoryTop, int &_dynamicMemoryTop, const int mainLabelAddr) {
+    void Run(byte *_memorySpace, Word *_registers, const int _textMemoryTop, int &_dynamicDataMemoryTop, const int mainLabelAddr) {
         memorySpace = _memorySpace;
         registers = _registers;
         IF_AVL = ID_AVL = EX_AVL = MEM_AVL = WB_AVL = true;
@@ -431,7 +450,7 @@ public:
         IF_ID.spare = ID_EX.spare = EX_MEM.spare = MEM_WB.spare = true;
         finished = false;
         textMemoryTop = _textMemoryTop;
-        dynamicMemoryTop = _dynamicMemoryTop;
+        dynamicDataMemoryTop = _dynamicDataMemoryTop;
         PC = mainLabelAddr;
         for (int i = 0; i < registerNum; ++i)
             registerStatus[i] = 0;
@@ -444,7 +463,7 @@ public:
             InstructionFetch();
         }
         
-        _dynamicMemoryTop = dynamicMemoryTop;
+        _dynamicDataMemoryTop = dynamicDataMemoryTop;
     }
 };
 
