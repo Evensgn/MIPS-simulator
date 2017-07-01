@@ -35,13 +35,11 @@ union Word {
 union Double {
     long long ll;
     unsigned long long ull;
-    struct {Word wd0, wd1;};
     struct {byte b0, b1, b2, b3, b4, b5, b6, b7;};
     
     Double() {}
     Double(long long _ll): ll(_ll) {}
     Double(unsigned long long _ull): ull(_ull) {}
-    Double(Word _wd0, Word _wd1): wd0(_wd0), wd1(_wd1) {}
     Double(byte _b0, byte _b1, byte _b2, byte _b3, byte _b4, byte _b5, byte _b6, byte _b7): \
         b0(_b0), b1(_b1), b2(_b2), b3(_b3), b4(_b4), b5(_b5), b6(_b6), b7(_b7) {}
 };

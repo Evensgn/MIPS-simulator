@@ -32,6 +32,9 @@ private:
     } EX_MEM;
     struct {
         bool spare;
+        InstInfo2 instInfo2;
+        Word res, res0, res1;
+        int nextInstAddr;
     } MEM_WB;
     
     void InstructionFetch() {
@@ -110,8 +113,8 @@ private:
                 return;
             }
             _instInfo.v0 = registers[2];
-            if (_instInfo.v0 == 1 || _instInfo.v0 == 4 || _instInfo.v0 == 8 || \
-                _instInfo.v0 == 9 || _instInfo.v0 == 17) {
+            if (_instInfo.v0.i == 1 || _instInfo.v0.i == 4 || _instInfo.v0.i == 8 || \
+                _instInfo.v0.i == 9 || _instInfo.v0.i == 17) {
                 // $a0
                 if (registerStatus[4] != 0) {
                     ID_STA = true;
@@ -119,7 +122,7 @@ private:
                 }
                 _instInfo.a0 = registers[4];
             }
-            if (_instInfo.v0 == 8) {
+            if (_instInfo.v0.i == 8) {
                 // $a1
                 if (registerStatus[5] != 0) {
                     ID_STA = true;
@@ -131,13 +134,13 @@ private:
         
         if (inst.rd != byte(255)) {
             _instInfo.rd = inst.rd;
-            ++(registerStatus[rd]);
+            ++(registerStatus[inst.rd]);
         }
         if (InClosedInterval(_instInfo.instType, _mul, _divu) && inst.rd == byte(255)) {
             ++(registerStatus[32]);
             ++(registerStatus[33]);
         }
-        else if (_instInfo.instType == _syscall && (_instInfo.v0 == 5 || _instInfo.v0 == 9)) {
+        else if (_instInfo.instType == _syscall && (_instInfo.v0.i == 5 || _instInfo.v0.i == 9)) {
             // $v0
             ++(registerStatus[2]);
         }
@@ -146,10 +149,10 @@ private:
             PC_pending = true;
         }
         else if (InClosedInterval(_instInfo.instType, _j, _jalr)) {
-            if (_instInfo.instType == j || _instInfo.instType == _jal) 
-                PC = _instInfo.address;
+            if (_instInfo.instType == _j || _instInfo.instType == _jal) 
+                PC = _instInfo.address.i;
             else 
-                PC = _instInfo.rsv;
+                PC = _instInfo.rsv.i;
         }
         else {
             PC += sizeof(BinaryInst);
@@ -201,14 +204,16 @@ private:
                 if (_instInfo.rde) res.i = a0.i * a1.i;
                 else {
                     resd.ll = (long long)a0.i * (long long)a1.i;
-                    res0 = resd.wd0; res1 = resd.wd1;
+                    res0 = Word(resd.b0, resd.b1, resd.b2, resd.b3);
+                    res1 = Word(resd.b4, resd.b5, resd.b6, resd.b7);
                 }
                 break;
             case _mulu:
                 if (_instInfo.rde) res.ui = a0.ui * a1.ui;
                 else {
                     resd.ull = (long long)a0.ui * (long long)a1.ui;
-                    res0 = resd.wd0; res1 = resd.wd1;
+                    res0 = Word(resd.b0, resd.b1, resd.b2, resd.b3);
+                    res1 = Word(resd.b4, resd.b5, resd.b6, resd.b7);
                 }
                 break;
             case _div:
@@ -253,9 +258,11 @@ private:
             case _blt:
             case _bltz:
                 res.i = (a0.i < a1.i) ? 1 : 0; break;
+            default:
+                break;
             }
             if (InClosedInterval(_instInfo.instType, _b, _bltz) && res.i == 1) {
-                PC = _instInfo.address;
+                PC = _instInfo.address.i;
                 PC_pending = false;
             }
         }
@@ -264,9 +271,9 @@ private:
         }
         else if (_instInfo.instType == _syscall) {
             int num;
-            switch (_instInfo.v0) {
+            switch (_instInfo.v0.i) {
             case 1:
-                cout << _instInfo.a0;
+                cout << _instInfo.a0.i;
                 break;
             case 5:
                 cin >> num;
@@ -276,8 +283,7 @@ private:
                 str = "";
                 for (int i = 1; i < _instInfo.a1.i; ++i) {
                     char c;
-                    bool flag = (cin >> c);
-                    if (!flag) break;
+                    if (!(cin >> c)) break;
                     str += c;
                 }
                 break;
@@ -323,51 +329,62 @@ private:
         }
         
         InstInfo2 _instInfo2 = EX_MEM.instInfo2;
-        Word res;
-        res = EX_MEM.res;
+        Word res = EX_MEM.res;
+        string str = EX_MEM.str;
                 
+        int pos;
         switch (_instInfo2.instType) {
         case _la:
             res = _instInfo2.address;        
             break;
         case _lb:
-            res.b0 = memorySpace[_instInfo2.address];
+            res.b0 = *(memorySpace + _instInfo2.address.i);
             break;
         case _lh:
-            res.b0 = memorySpace[_instInfo2.address];
-            res.b1 = memorySpace[_instInfo2.address + 1];
+            res.b0 = *(memorySpace + _instInfo2.address.i);
+            res.b1 = *(memorySpace + _instInfo2.address.i + 1);
             break;
         case _lw:
-            res.b0 = memorySpace[_instInfo2.address];
-            res.b1 = memorySpace[_instInfo2.address + 1];
-            res.b2 = memorySpace[_instInfo2.address + 2];
-            res.b3 = memorySpace[_instInfo2.address + 3];
+            res.b0 = *(memorySpace + _instInfo2.address.i);
+            res.b1 = *(memorySpace + _instInfo2.address.i + 1);
+            res.b2 = *(memorySpace + _instInfo2.address.i + 2);
+            res.b3 = *(memorySpace + _instInfo2.address.i + 3);
             break;
         case _sb:
-            memorySpace[_instInfo2.address] = _instInfo2.rsv.b0;
+            *(memorySpace + _instInfo2.address.i) = _instInfo2.rsv.b0;
             break;
         case _sh:
-            memorySpace[_instInfo2.address] = _instInfo2.rsv.b0;
-            memorySpace[_instInfo2.address + 1] = _instInfo2.rsv.b1;
+            *(memorySpace + _instInfo2.address.i) = _instInfo2.rsv.b0;
+            *(memorySpace + _instInfo2.address.i + 1) = _instInfo2.rsv.b1;
             break;            
         case _sw:
-            memorySpace[_instInfo2.address] = _instInfo2.rsv.b0;
-            memorySpace[_instInfo2.address + 1] = _instInfo2.rsv.b1;
-            memorySpace[_instInfo2.address + 2] = _instInfo2.rsv.b2;
-            memorySpace[_instInfo2.address + 3] = _instInfo2.rsv.b3;
+            *(memorySpace + _instInfo2.address.i) = _instInfo2.rsv.b0;
+            *(memorySpace + _instInfo2.address.i + 1) = _instInfo2.rsv.b1;
+            *(memorySpace + _instInfo2.address.i + 2) = _instInfo2.rsv.b2;
+            *(memorySpace + _instInfo2.address.i + 3) = _instInfo2.rsv.b3;
             break;
         case _syscall:
-            switch (_instInfo2.v0) {
+            switch (_instInfo2.v0.i) {
             case 4:
-                
+                str = "";
+                pos = _instInfo2.a0.i;
+                while (memorySpace[pos] != '\0') {
+                    str += memorySpace[pos];
+                    ++pos;
+                }
+                cout << str;
                 break;
             case 8:
+                pos = _instInfo2.a0.i;
+                for (size_t i = 0; i < str.length(); ++i) 
+                    memorySpace[pos++] = str[i];
+                memorySpace[pos++] = '\0';
                 break;
             case 9:
                 while (dynamicMemoryTop % 4 != 0)
                     ++dynamicMemoryTop;
                 res.i = dynamicMemoryTop;
-                dynamicMemoryTop += _instInfo2.a0;
+                dynamicMemoryTop += _instInfo2.a0.i;
                 break;
             default:
                 break;
@@ -377,6 +394,11 @@ private:
             break;
         }
         
+        MEM_WB.instInfo2 = _instInfo2;
+        MEM_WB.res = res;
+        MEM_WB.res0 = EX_MEM.res0;
+        MEM_WB.res1 = EX_MEM.res1;
+        MEM_WB.nextInstAddr = EX_MEM.nextInstAddr;
         MEM_WB.spare = false;
         MEM_STA = false;
         EX_MEM.spare = true;
@@ -385,6 +407,8 @@ private:
     void WriteBack() {
         if (finished || exited) return;
         if (MEM_WB.spare) return;
+        
+        
         
         WB_STA = false;
         MEM_WB.spare = true;
