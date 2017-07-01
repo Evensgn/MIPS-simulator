@@ -31,3 +31,4 @@ Zhou Fan (@Evensgn)
 **July 1**
 * Wrote the `Execution` stage
 * Wrote the `Memory Access` stage
+* Wrote the `Write Back` stage
