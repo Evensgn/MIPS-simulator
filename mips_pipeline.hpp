@@ -38,9 +38,20 @@ private:
 #ifdef DEBUG_PIPELINE
         cout << "Instruction Fetch *** TRY ***:" << endl;
 #endif
-        if (finished || exited) return; 
+        if (finished || exited) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: finished || exited" << endl;
+            system("pause");
+#endif
+            return;
+        }
         if (ID_STA || PC_pending) {
             IF_STA = true;
+#ifdef DEBUG_PIPELINE
+            if (ID_STA) cout << "RETURN: ID_STA" << endl;
+            else cout << "RETURN: PC_pending" << endl;
+            system("pause");
+#endif
             return;
         }
         
@@ -50,6 +61,7 @@ private:
         if (PC == textMemoryTop) {
             finished = true;
             cout << PC << " " << textMemoryTop << " Oh !" << endl;
+            system("pause");
             return;
         }
         BinaryInst _binaryInst; 
@@ -64,11 +76,27 @@ private:
     void InstructionDecode() {
 #ifdef DEBUG_PIPELINE
         cout << "Instruction Decode *** TRY ***:" << endl;
+#endif        
+        if (finished || exited) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: finished || exited" << endl;
+            system("pause");
 #endif
-        if (finished || exited) return;
-        if (IF_ID.spare) return;
+            return;
+        }
+        if (IF_ID.spare) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: spare" << endl;
+            system("pause");
+#endif
+            return;
+        }
         if (EX_STA) {
             ID_STA = true;
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: EX_STA" << endl;
+            system("pause");
+#endif
             return;
         }
         
@@ -123,6 +151,10 @@ private:
             // $v0
             if (registerStatus[2] != 0) { 
                 ID_STA = true;
+#ifdef DEBUG_PIPELINE
+                cout << "register $v0 to be written" << endl;
+                system("pause");
+#endif
                 return;
             }
             _instInfo.v0 = registers[2];
@@ -147,6 +179,9 @@ private:
         
         if (inst.rd != byte(255)) {
             _instInfo.rd = inst.rd;
+#ifdef DEBUG_PIPELINE
+            cout << "Make rd " << (int)inst.rd << " <-" << endl;
+#endif
             ++(registerStatus[inst.rd]);
         }
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
@@ -185,10 +220,26 @@ private:
 #ifdef DEBUG_PIPELINE
         cout << "Execution *** TRY ***:" << endl;
 #endif
-        if (finished || exited) return;
-        if (ID_EX.spare) return;
+        if (finished || exited) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: finished || exited" << endl;
+            system("pause");
+#endif
+            return;
+        }
+        if (ID_EX.spare) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: spare" << endl;
+            system("pause");
+#endif
+            return;
+        }
         if (MEM_STA) {
             EX_STA = true;
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: MEM_STA" << endl;
+            system("pause");
+#endif
             return;
         }
         
@@ -262,7 +313,7 @@ private:
                 res.i = (a0.i == a1.i) ? 1 : 0; break;
             case _sne: 
             case _bne: 
-            case _bnez:
+            case _bnez: 
                 res.i = (a0.i != a1.i) ? 1 : 0; break;
             case _sge:
             case _bge:
@@ -283,8 +334,9 @@ private:
             default:
                 break;
             }
-            if (InClosedInterval(_instInfo.instType, _b, _bltz) && res.i == 1) {
-                PC = _instInfo.address.i;
+            if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
+                if (res.i == 1) PC = _instInfo.address.i;
+                else PC += sizeof(BinaryInst);
                 PC_pending = false;
             }
         }
@@ -348,10 +400,26 @@ private:
 #ifdef DEBUG_PIPELINE
         cout << "Memory Access *** TRY ***:" << endl;
 #endif
-        if (finished || exited) return;
-        if (EX_MEM.spare) return;
+        if (finished || exited) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: finished || exited" << endl;
+            system("pause");
+#endif
+            return;
+        }
+        if (EX_MEM.spare) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: spare" << endl;
+            system("pause");
+#endif
+            return;
+        }
         if (WB_STA) {
             MEM_STA = true;
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: WB_STA" << endl;
+            system("pause");
+#endif
             return;
         }
         
@@ -437,8 +505,20 @@ private:
 #ifdef DEBUG_PIPELINE
         cout << "Write back *** TRY ***:" << endl;
 #endif
-        if (finished || exited) return;
-        if (MEM_WB.spare) return;
+        if (finished || exited) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: finished || exited" << endl;
+            system("pause");
+#endif
+            return;
+        }
+        if (MEM_WB.spare) {
+#ifdef DEBUG_PIPELINE
+            cout << "RETURN: spare" << endl;
+            system("pause");
+#endif
+            return;
+        }
         
 #ifdef DEBUG_PIPELINE
         cout << "Write Back:" << endl;
@@ -449,6 +529,9 @@ private:
                 registers[_instInfo2.rd] = _instInfo2.rsv;
             else registers[_instInfo2.rd] = MEM_WB.res;
             --(registerStatus[_instInfo2.rd]);
+#ifdef DEBUG_PIPELINE
+            cout << "Write register " << (int)_instInfo2.rd << " <-" << endl;
+#endif
         }
         else if (InClosedInterval(_instInfo2.instType, _mul, _divu) && _instInfo2.rd == byte(255)) {
             registers[32] = MEM_WB.res0;
@@ -490,20 +573,20 @@ public:
 #ifdef DEBUG_PIPELINE
         cout << "Pipeline running:" << endl;
 #endif
-        /*while (!finished && !exited) {
-            WriteBack();
-            MemoryAccess();
-            Execution();
-            InstructionDecode();
-            InstructionFetch();
-        }*/
         while (!finished && !exited) {
+            WriteBack();
+            MemoryAccess();
+            Execution();
+            InstructionDecode();
+            InstructionFetch();
+        }
+        /*while (!finished && !exited) {
             InstructionFetch();
             InstructionDecode();
             Execution();
             MemoryAccess();
             WriteBack();
-        }
+        }*/
         
         _dynamicDataMemoryTop = dynamicDataMemoryTop;
     }

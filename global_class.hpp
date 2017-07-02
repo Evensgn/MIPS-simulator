@@ -102,6 +102,7 @@ public:
     Word rsv, rtv, constant, offset, address, v0, a0, a1;
     bool rse, rte, rde;
     InstInfo() {
+        rd = byte(255);
         rse = rte = rde = false;
     }
 };
@@ -111,6 +112,9 @@ public:
     TokenType instType;
     byte rd;
     Word address, rsv, v0, a0, a1;
+    InstInfo2() {
+        rd = byte(255);
+    }
 };
 
 #endif // GLOBAL_CLASS_HPP
