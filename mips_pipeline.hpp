@@ -121,7 +121,7 @@ private:
         inst = *(reinterpret_cast<Instruction*>(&(IF_ID.binaryInst)));
 #ifdef DEBUG_PIPELINE
         cout << "Decode: [op:" << int(inst.op) << ", rd:" << int(inst.rd) << ", rs:" << int(inst.rs) << \
-             ", rt:" << int(inst.rt) << "]" << endl;
+             ", rt:" << int(inst.rt) << ", const:" << inst.constant.i << "]" << endl;
         if ((int)inst.rd == 31) system("pause");
 #endif
         InstInfo _instInfo;
@@ -203,6 +203,7 @@ private:
         
         if (inst.rd != byte(255)) {
             _instInfo.rd = inst.rd;
+            _instInfo.rde = true;
 #ifdef DEBUG_PIPELINE
             cout << "Make rd " << (int)inst.rd << " <-" << endl;
 #endif
@@ -210,6 +211,7 @@ private:
         }
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
             _instInfo.rd = 31;
+            _instInfo.rde = true;
             ++(registerStatus[31]);
         }
         if (InClosedInterval(_instInfo.instType, _mul, _divu) && inst.rd == byte(255)) {
@@ -289,15 +291,15 @@ private:
         else if (_instInfo.instType == _li) {
             res = _instInfo.constant;
         }
-        else if (_instInfo.instType == _b) {
-            res.i = 1;
-        }
         else if (InClosedInterval(_instInfo.instType, _add, _bltz)) {
             a0 = _instInfo.rsv;
             if (InClosedInterval(_instInfo.instType, _beqz, _bltz))
                 _instInfo.constant.i = 0;
             if (_instInfo.rte) a1 = _instInfo.rtv;
             else a1 = _instInfo.constant;
+#ifdef DEBUG_PIPELINE
+            cout << "a0:" << a0.i << ", a1:" << a1.i << endl;
+#endif
             switch (_instInfo.instType) {
             case _add: res.i = a0.i + a1.i; break;
             case _addu: 
@@ -338,6 +340,7 @@ private:
             case _xoru: res.ui = a0.ui ^ a1.ui; break;
             case _rem: res.i = a0.i % a1.i; break;
             case _remu: res.ui = a0.ui % a1.ui; break;
+            case _b: res.i = 1; break;
             case _seq: 
             case _beq:
             case _beqz:
@@ -422,6 +425,10 @@ private:
         _instInfo2.v0 = _instInfo.v0;
         _instInfo2.a0 = _instInfo.a0;
         _instInfo2.a1 = _instInfo.a1;
+        
+#ifdef DEBUG_PIPELINE
+        cout << "res: " << res.i << endl;
+#endif
         
         EX_MEM.instInfo2 = _instInfo2;
         EX_MEM.res = res;
@@ -577,7 +584,7 @@ private:
             else registers[_instInfo2.rd] = MEM_WB.res;
             --(registerStatus[_instInfo2.rd]);
 #ifdef DEBUG_PIPELINE
-            cout << "Write register " << (int)_instInfo2.rd << " <-" << endl;
+            cout << "Write register " << (int)_instInfo2.rd << " <- " << registers[_instInfo2.rd].i << endl;
             if (registerStatus[_instInfo2.rd] < 0) {
                 cout << "54749110!" << endl;
                 system("pause");

@@ -187,6 +187,7 @@ private:
     
     void ProcessDataEntry(const Entry &entry, byte* memorySpace, int &staticDataMemoryTop) {
         int ele;
+        string str;
         switch (entry.tokenType) {
         case _align:
             ele = 1 << StringToInteger(entry.argv[0]);
@@ -194,12 +195,14 @@ private:
                 memorySpace[staticDataMemoryTop++] = byte(0);    
             break;
         case _ascii:
-            for (size_t i = 0; i < entry.argv[0].length(); ++i)
-                memorySpace[staticDataMemoryTop++] = byte(entry.argv[0].at(i));
+            str = DecodeEscapedString(entry.argv[0]);
+            for (size_t i = 0; i < str.length(); ++i)
+                memorySpace[staticDataMemoryTop++] = byte(str.at(i));
             break;
         case _asciiz:
-            for (size_t i = 0; i < entry.argv[0].length(); ++i)
-                memorySpace[staticDataMemoryTop++] = byte(entry.argv[0].at(i));
+            str = DecodeEscapedString(entry.argv[0]);
+            for (size_t i = 0; i < str.length(); ++i)
+                memorySpace[staticDataMemoryTop++] = byte(str.at(i));
             memorySpace[staticDataMemoryTop++] = byte('\0');
             break;
         case _byte:
