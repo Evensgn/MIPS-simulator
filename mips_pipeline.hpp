@@ -10,7 +10,6 @@ private:
     int PC;
     int textMemoryTop, dynamicDataMemoryTop;
     bool finished, exited, PC_pending;
-    bool IF_AVL, ID_AVL, EX_AVL, MEM_AVL, WB_AVL;
     bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
     int registerStatus[registerNum];
     struct {
@@ -36,14 +35,21 @@ private:
     } MEM_WB;
     
     void InstructionFetch() {
+#ifdef DEBUG_PIPELINE
+        cout << "Instruction Fetch *** TRY ***:" << endl;
+#endif
         if (finished || exited) return; 
         if (ID_STA || PC_pending) {
             IF_STA = true;
             return;
         }
         
+#ifdef DEBUG_PIPELINE
+        cout << "Instruction Fetch:" << endl;
+#endif
         if (PC == textMemoryTop) {
             finished = true;
+            cout << PC << " " << textMemoryTop << " Oh !" << endl;
             return;
         }
         BinaryInst _binaryInst; 
@@ -56,6 +62,9 @@ private:
     }
     
     void InstructionDecode() {
+#ifdef DEBUG_PIPELINE
+        cout << "Instruction Decode *** TRY ***:" << endl;
+#endif
         if (finished || exited) return;
         if (IF_ID.spare) return;
         if (EX_STA) {
@@ -63,8 +72,14 @@ private:
             return;
         }
         
+#ifdef DEBUG_PIPELINE
+        cout << "Instruction Decode:" << endl;
+#endif
         Instruction inst;
         inst = *(reinterpret_cast<Instruction*>(&(IF_ID.binaryInst)));
+#ifdef DEBUG_PIPELINE
+        cout << "Decode: [" << int(inst.op) << ", " << int(inst.rd) << "]" << endl;
+#endif
         InstInfo _instInfo;
         _instInfo.instType = TokenType(inst.op);
         _instInfo.constant = inst.constant;
@@ -167,13 +182,19 @@ private:
     }
     
     void Execution() {
+#ifdef DEBUG_PIPELINE
+        cout << "Execution *** TRY ***:" << endl;
+#endif
         if (finished || exited) return;
         if (ID_EX.spare) return;
         if (MEM_STA) {
             EX_STA = true;
             return;
         }
-         
+        
+#ifdef DEBUG_PIPELINE
+        cout << "Execution:" << endl;
+#endif
         InstInfo _instInfo = ID_EX.instInfo;
         Word a0, a1, res, res0, res1;
         Double resd;
@@ -324,6 +345,9 @@ private:
     }
         
     void MemoryAccess() {
+#ifdef DEBUG_PIPELINE
+        cout << "Memory Access *** TRY ***:" << endl;
+#endif
         if (finished || exited) return;
         if (EX_MEM.spare) return;
         if (WB_STA) {
@@ -331,6 +355,9 @@ private:
             return;
         }
         
+#ifdef DEBUG_PIPELINE
+        cout << "Memory Access:" << endl;
+#endif
         InstInfo2 _instInfo2 = EX_MEM.instInfo2;
         Word res = EX_MEM.res;
         string str = EX_MEM.str;
@@ -407,9 +434,15 @@ private:
     }
     
     void WriteBack() {
+#ifdef DEBUG_PIPELINE
+        cout << "Write back *** TRY ***:" << endl;
+#endif
         if (finished || exited) return;
         if (MEM_WB.spare) return;
         
+#ifdef DEBUG_PIPELINE
+        cout << "Write Back:" << endl;
+#endif
         InstInfo2 _instInfo2 = MEM_WB.instInfo2;
         if (_instInfo2.rd != byte(255)) {
             if (InClosedInterval(_instInfo2.instType, _move, _mflo)) 
@@ -445,22 +478,31 @@ public:
     void Run(byte *_memorySpace, Word *_registers, const int _textMemoryTop, int &_dynamicDataMemoryTop, const int mainLabelAddr) {
         memorySpace = _memorySpace;
         registers = _registers;
-        IF_AVL = ID_AVL = EX_AVL = MEM_AVL = WB_AVL = true;
         IF_STA = ID_STA = EX_STA = MEM_STA = WB_STA = false;
         IF_ID.spare = ID_EX.spare = EX_MEM.spare = MEM_WB.spare = true;
-        finished = false;
+        finished = exited = PC_pending = false;
         textMemoryTop = _textMemoryTop;
         dynamicDataMemoryTop = _dynamicDataMemoryTop;
         PC = mainLabelAddr;
         for (int i = 0; i < registerNum; ++i)
             registerStatus[i] = 0;
         
-        while (!finished && !exited) {
+#ifdef DEBUG_PIPELINE
+        cout << "Pipeline running:" << endl;
+#endif
+        /*while (!finished && !exited) {
             WriteBack();
             MemoryAccess();
             Execution();
             InstructionDecode();
             InstructionFetch();
+        }*/
+        while (!finished && !exited) {
+            InstructionFetch();
+            InstructionDecode();
+            Execution();
+            MemoryAccess();
+            WriteBack();
         }
         
         _dynamicDataMemoryTop = dynamicDataMemoryTop;

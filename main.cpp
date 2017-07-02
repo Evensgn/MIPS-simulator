@@ -18,12 +18,6 @@ int main()
 #endif
     MIPS_Simulator::instance().ProcessMIPSText(mipsSourceText);
     MIPS_Simulator::instance().RunPipeline();
-        
-    ifstream inFile("test.in");
-    ofstream ansFile("test.ans");
-
-    inFile.close();
-    ansFile.close();
 #ifdef DEBUG
     cout << "Done." << endl;
 #endif
