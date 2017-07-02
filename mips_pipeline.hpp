@@ -390,6 +390,8 @@ private:
             switch (_instInfo.v0.i) {
             case 1:
                 cout << _instInfo.a0.i;
+                cout << "\n???" << endl;
+                system("pause");
                 break;
             case 5:
                 cin >> num;

@@ -22,7 +22,7 @@ union Half {
 // word : 4 bytes
 union Word {
     int i;
-    unsigned short ui;
+    unsigned int  ui;
     struct {byte b0, b1, b2, b3;};
     
     Word() {}

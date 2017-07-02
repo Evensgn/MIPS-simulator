@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
     MIPS_Simulator::instance().SimulatorInit();
     
     // read mips text from file *.s
-    ifstream sFile(argv[1]);
-    //ifstream sFile("array_test1-mahaojun.s");
+    //ifstream sFile(argv[1]);
+    ifstream sFile("builtin-5140519064-youyurong.s");
     stringstream buffer;
     buffer << sFile.rdbuf();
     sFile.close();
