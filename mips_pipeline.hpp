@@ -483,16 +483,20 @@ private:
         string str = EX_MEM.str;
                 
         int pos;
+        byte bt;
+        Half ht;
         switch (_instInfo2.instType) {
         case _la:
             res = _instInfo2.address;        
             break;
         case _lb:
-            res.b0 = memorySpace[_instInfo2.address.i];
+            bt = memorySpace[_instInfo2.address.i];
+            res.i = int(bt);
             break;
          case _lh:
-            res.b0 = memorySpace[_instInfo2.address.i];
-            res.b1 = memorySpace[_instInfo2.address.i + 1];
+            ht.b0 = memorySpace[_instInfo2.address.i];
+            ht.b1 = memorySpace[_instInfo2.address.i + 1];
+            res.i = int(ht.s);
             break;
         case _lw:
             res.b0 = memorySpace[_instInfo2.address.i];
@@ -501,11 +505,13 @@ private:
             res.b3 = memorySpace[_instInfo2.address.i + 3];
             break;
         case _sb:
-            memorySpace[_instInfo2.address.i] = _instInfo2.rsv.b0;
+            bt = byte(_instInfo2.rsv.i);
+            memorySpace[_instInfo2.address.i] = bt;
             break;
         case _sh:
-            memorySpace[_instInfo2.address.i] = _instInfo2.rsv.b0;
-            memorySpace[_instInfo2.address.i + 1] = _instInfo2.rsv.b1;
+            ht.s = short(_instInfo2.rsv.i);
+            memorySpace[_instInfo2.address.i] = ht.b0;
+            memorySpace[_instInfo2.address.i + 1] = ht.b1;
             break;    
         case _sw:
             memorySpace[_instInfo2.address.i] = _instInfo2.rsv.b0;
