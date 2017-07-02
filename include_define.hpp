@@ -27,6 +27,7 @@ const int registerNum = 32 + 2;
 #define DEBUG_ENTRY_TYPE
 #define DEBUG_ENTRY_TO_INSTRUCTION
 #define DEBUG_STORE_INSTRUCTION
-//#define DEBUG_PIPELINE
+#define DEBUG_PIPELINE
+//#define DEBUG_PAUSE
 
 #endif // INCLUDE_DEFINE_HPP

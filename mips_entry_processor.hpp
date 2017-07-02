@@ -291,6 +291,7 @@ public:
                  << ", " << int(ins.rt) << ", " << int(ins.rd) << ", " << ins.constant.i \
                  << ", " << ins.offset.i << ", " << ins.address.i << "]" << endl; 
         }
+        system("pause");
 #endif
     }
 };

@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -Wall -std=c++11 -O2
 
 ################!! MODIFY HERE !!####################
-_OBJ = include_define.o utility.o global_class.o evensgn_string.o mips_simulator.o mips_text_parser.o mips_entry_processor.o mips_pipeline.o
+_OBJ = main.o
 _DEPS = include_define.hpp utility.hpp global_class.hpp evensgn_string.hpp mips_simulator.hpp mips_text_parser.hpp mips_entry_processor.hpp mips_pipeline.hpp
 #####################################################
 

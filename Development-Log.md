@@ -32,7 +32,8 @@ Zhou Fan (@Evensgn)
 * Wrote the `Execution` stage
 * Wrote the `Memory Access` stage
 * Wrote the `Write Back` stage
+* Started debugging the pipeline
 
 **July 2**
 * Kept debugging the pipeline
-* The simulator successfully runned a MIPS code for the first time
+* The simulator successfully runned a MIPS code for the first time ;-)

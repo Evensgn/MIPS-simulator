@@ -41,7 +41,9 @@ private:
         if (finished || exited) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: finished || exited" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -50,7 +52,9 @@ private:
 #ifdef DEBUG_PIPELINE
             if (ID_STA) cout << "RETURN: ID_STA" << endl;
             else cout << "RETURN: PC_pending" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -60,8 +64,12 @@ private:
 #endif
         if (PC == textMemoryTop) {
             finished = true;
+#ifdef DEBUG_PIPELINE
             cout << PC << " " << textMemoryTop << " Oh !" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
+#endif
             return;
         }
         BinaryInst _binaryInst; 
@@ -80,14 +88,18 @@ private:
         if (finished || exited) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: finished || exited" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
         if (IF_ID.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -95,7 +107,9 @@ private:
             ID_STA = true;
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: EX_STA" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -106,7 +120,9 @@ private:
         Instruction inst;
         inst = *(reinterpret_cast<Instruction*>(&(IF_ID.binaryInst)));
 #ifdef DEBUG_PIPELINE
-        cout << "Decode: [" << int(inst.op) << ", " << int(inst.rd) << "]" << endl;
+        cout << "Decode: [op:" << int(inst.op) << ", rd:" << int(inst.rd) << ", rs:" << int(inst.rs) << \
+             ", rt:" << int(inst.rt) << "]" << endl;
+        if ((int)inst.rd == 31) system("pause");
 #endif
         InstInfo _instInfo;
         _instInfo.instType = TokenType(inst.op);
@@ -116,6 +132,9 @@ private:
         if (inst.rs != byte(255)) {
             // register is to be written
             if (registerStatus[inst.rs] != 0) {
+#ifdef DEBUG_PIPELINE
+                cout << "Stall: rs to be written" << endl;
+#endif
                 ID_STA = true;
                 return;
             }
@@ -125,6 +144,9 @@ private:
         if (inst.rt != byte(255)) {
             // register is to be written
             if (registerStatus[inst.rt] != 0) {
+#ifdef DEBUG_PIPELINE
+                cout << "Stall: rt to be written" << endl;
+#endif
                 ID_STA = true;
                 return;
             }
@@ -153,7 +175,9 @@ private:
                 ID_STA = true;
 #ifdef DEBUG_PIPELINE
                 cout << "register $v0 to be written" << endl;
-                system("pause");
+#ifdef DEBUG_PAUSE 
+                system("pause"); 
+#endif
 #endif
                 return;
             }
@@ -186,6 +210,7 @@ private:
         }
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
             _instInfo.rd = 31;
+            ++(registerStatus[31]);
         }
         if (InClosedInterval(_instInfo.instType, _mul, _divu) && inst.rd == byte(255)) {
             ++(registerStatus[32]);
@@ -223,14 +248,18 @@ private:
         if (finished || exited) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: finished || exited" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
         if (ID_EX.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -238,13 +267,15 @@ private:
             EX_STA = true;
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: MEM_STA" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
         
 #ifdef DEBUG_PIPELINE
-        cout << "Execution:" << endl;
+        cout << "Execution: " << (int)ID_EX.instInfo.instType << endl;
 #endif
         InstInfo _instInfo = ID_EX.instInfo;
         Word a0, a1, res, res0, res1;
@@ -343,8 +374,13 @@ private:
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
             res.i = ID_EX.nextInstAddr;
         }
-        else if (InClosedInterval(_instInfo.instType, _la, _sw) && _instInfo.rte) {
-            _instInfo.address.i = _instInfo.rtv.i + _instInfo.offset.i;
+        else if (InClosedInterval(_instInfo.instType, _la, _sw)) {
+            if (_instInfo.rte) {
+                _instInfo.address.i = _instInfo.rtv.i + _instInfo.offset.i;
+#ifdef DEBUG_PIPELINE
+                cout << "calc address: " << _instInfo.rtv.i << " " << _instInfo.offset.i << endl;
+#endif
+            }
         }
         else if (_instInfo.instType == _syscall) {
             int num;
@@ -391,6 +427,7 @@ private:
         EX_MEM.res = res;
         EX_MEM.res0 = res0;
         EX_MEM.res1 = res1;
+        EX_MEM.str = str;
         EX_MEM.spare = false;
         EX_STA = false;
         ID_EX.spare = true;
@@ -403,14 +440,18 @@ private:
         if (finished || exited) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: finished || exited" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
         if (EX_MEM.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -418,13 +459,15 @@ private:
             MEM_STA = true;
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: WB_STA" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
         
 #ifdef DEBUG_PIPELINE
-        cout << "Memory Access:" << endl;
+        cout << "Memory Access:"  << (int)EX_MEM.instInfo2.instType << " " << EX_MEM.instInfo2.address.i << endl;
 #endif
         InstInfo2 _instInfo2 = EX_MEM.instInfo2;
         Word res = EX_MEM.res;
@@ -508,14 +551,18 @@ private:
         if (finished || exited) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: finished || exited" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
         if (MEM_WB.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-            system("pause");
+#ifdef DEBUG_PAUSE 
+            system("pause"); 
+#endif
 #endif
             return;
         }
@@ -531,6 +578,10 @@ private:
             --(registerStatus[_instInfo2.rd]);
 #ifdef DEBUG_PIPELINE
             cout << "Write register " << (int)_instInfo2.rd << " <-" << endl;
+            if (registerStatus[_instInfo2.rd] < 0) {
+                cout << "54749110!" << endl;
+                system("pause");
+            }
 #endif
         }
         else if (InClosedInterval(_instInfo2.instType, _mul, _divu) && _instInfo2.rd == byte(255)) {
