@@ -103,7 +103,7 @@ private:
     int JumpToNextToken(const string &str, int pos) {
         ++pos;
         while (pos < (int)str.length()) {
-            if (str[pos] != ' ' && str[pos] != '\t' && str[pos] != '\n') break;
+            if (str[pos] != ',' && str[pos] != ' ' && str[pos] != '\t' && str[pos] != '\n') break;
             else ++pos;
         }
         return pos;
@@ -147,7 +147,7 @@ private:
             p2 = p1;
             if (str[p2] == '\'' || str[p2] == '\"') {
                 p2 = SkipString(str, p2, str[p2]);
-                ++p1;
+                ++p2;
             }
             else p2 = SkipNonStringToken(str, p2);
 #ifdef DEBUG_ENTRY_SPLIT

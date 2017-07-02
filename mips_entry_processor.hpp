@@ -184,28 +184,39 @@ private:
         return ret;
     }
     
-    
     void ProcessDataEntry(const Entry &entry, byte* memorySpace, int &staticDataMemoryTop) {
         int ele;
         string str;
         switch (entry.tokenType) {
         case _align:
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".align " << StringToInteger(entry.argv[0]) << endl;
+#endif
             ele = 1 << StringToInteger(entry.argv[0]);
             while (staticDataMemoryTop % ele != 0 && staticDataMemoryTop < maxMemoryByte) 
                 memorySpace[staticDataMemoryTop++] = byte(0);    
             break;
         case _ascii:
-            str = DecodeEscapedString(entry.argv[0]);
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".ascii " << DecodeEscapedString(string(entry.argv[0], 1, entry.argv[0].length() - 2)) << endl;
+#endif
+            str = DecodeEscapedString(string(entry.argv[0], 1, entry.argv[0].length() - 2));
             for (size_t i = 0; i < str.length(); ++i)
                 memorySpace[staticDataMemoryTop++] = byte(str.at(i));
             break;
         case _asciiz:
-            str = DecodeEscapedString(entry.argv[0]);
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".asciiz " << DecodeEscapedString(string(entry.argv[0], 1, entry.argv[0].length() - 2)) << endl;
+#endif
+            str = DecodeEscapedString(string(entry.argv[0], 1, entry.argv[0].length() - 2));
             for (size_t i = 0; i < str.length(); ++i)
                 memorySpace[staticDataMemoryTop++] = byte(str.at(i));
             memorySpace[staticDataMemoryTop++] = byte('\0');
             break;
         case _byte:
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".byte " << endl;
+#endif
             for (size_t i = 0; i < entry.argv.size(); ++i) {
                 byte bt;
                 if (entry.argv[i].at(0) == '\'')
@@ -216,6 +227,9 @@ private:
             }
             break;
         case _half:
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".half " << endl;
+#endif
             for (size_t i = 0; i < entry.argv.size(); ++i) {
                 Half hf;
                 if (entry.argv[i].at(0) == '\'')
@@ -227,6 +241,9 @@ private:
             }
             break;
         case _word:
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".word " << endl;
+#endif
             for (size_t i = 0; i < entry.argv.size(); ++i) {
                 Word wd;
                 if (entry.argv[i].at(0) == '\'')
@@ -238,7 +255,11 @@ private:
                 memorySpace[staticDataMemoryTop++] = wd.b2; 
                 memorySpace[staticDataMemoryTop++] = wd.b3;
             }
+            break;
         case _space:
+#ifdef DEBUG_ENTRY_STATIC_DATA
+            cout << ".space " << StringToInteger(entry.argv[0]) << endl;
+#endif
             staticDataMemoryTop += StringToInteger(entry.argv[0]);
             break;
         default: break;
