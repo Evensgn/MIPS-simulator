@@ -13,7 +13,7 @@ union Half {
     unsigned short us;
     struct {byte b0, b1;};
     
-    Half() {}
+    Half() {s = 0;}
     Half(short _s): s(_s) {}
     Half(unsigned short _us): us(_us) {}
     Half(byte _b0, byte _b1): b0(_b0), b1(_b1) {}
@@ -25,7 +25,7 @@ union Word {
     unsigned int  ui;
     struct {byte b0, b1, b2, b3;};
     
-    Word() {}
+    Word() {i = 0;}
     Word(int _i): i(_i) {}
     Word(unsigned int _ui): ui(_ui) {}
     Word(byte _b0, byte _b1, byte _b2, byte _b3): b0(_b0), b1(_b1), b2(_b2), b3(_b3) {}
@@ -37,7 +37,7 @@ union Double {
     unsigned long long ull;
     struct {byte b0, b1, b2, b3, b4, b5, b6, b7;};
     
-    Double() {}
+    Double() {ll = 0;}
     Double(long long _ll): ll(_ll) {}
     Double(unsigned long long _ull): ull(_ull) {}
     Double(byte _b0, byte _b1, byte _b2, byte _b3, byte _b4, byte _b5, byte _b6, byte _b7): \

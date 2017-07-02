@@ -122,7 +122,6 @@ private:
 #ifdef DEBUG_PIPELINE
         cout << "Decode: [op:" << int(inst.op) << ", rd:" << int(inst.rd) << ", rs:" << int(inst.rs) << \
              ", rt:" << int(inst.rt) << ", const:" << inst.constant.i << "]" << endl;
-        if ((int)inst.rd == 31) system("pause");
 #endif
         InstInfo _instInfo;
         _instInfo.instType = TokenType(inst.op);
@@ -399,6 +398,9 @@ private:
                 break;
             case 8:
                 str = "";
+#ifdef DEBUG_PIPELINE
+                cout << _instInfo.a1.i << endl;
+#endif
                 for (int i = 1; i < _instInfo.a1.i; ++i) {
                     char c;
                     if (!(cin >> c)) break;

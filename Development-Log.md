@@ -37,3 +37,6 @@ Zhou Fan (@Evensgn)
 **July 2**
 * Kept debugging the pipeline
 * The simulator successfully runned a MIPS code for the first time ;-)
+* Tried the test data and passed only third of them
+
+**July 3**
