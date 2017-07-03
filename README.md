@@ -24,9 +24,16 @@ For my detailed development log, please [check it out here](Development-Log.md).
 * `MIPS_Entry_Processor` : Process entries, store instruction in memory and manage static data
 * `MIPS_Pipeline` : Pipeline to execute MIPS instructions
 
+### Branch Prediction
+
+For branch instructions, this simulator uses an **Two-Level Adaptive Predictor** with `n == 2`. 
+> A two-level adaptive predictor remembers the history of the last n occurrences of the branch and uses one saturating counter for each of the possible 2^n history patterns.
+> 
+> Branch Predictor - Wikipedia
+
 ### Instruction Encoding Format
 
-In order to store instructions (within the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format (which is different from standard MIPS intruction encoding):
+In order to store instructions (within the specified instruction subset) in memory, each instruction is encoded into binary digits in the following format (To simplify the encoding/decoding process, the format is different from standard MIPS intruction encoding format):
 
 <table>
   <tr>
@@ -70,3 +77,4 @@ The default value of `rd`, `rs` and `rt` is 255 so that:
 * *Computer Organization and Design, The Hardware/Software Interface, Third Edition*
 * [Tutorial about pipeline, Iowa State University](https://web.cs.iastate.edu/~prabhu/Tutorial/PIPELINE/dataHaz.html#example)
 * [MIPS Pipeline, Hakim Weatherspoon, Cornell University, 2012](http://www.cs.cornell.edu/courses/cs3410/2012sp/lecture/09-pipelined-cpu-i-g.pdf)
+* [Branch Predictor - Wikipedia](https://en.wikipedia.org/wiki/Branch_predictor)
