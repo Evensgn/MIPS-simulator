@@ -18,7 +18,7 @@ private:
         int nextInstAddr;
     } IF_ID;
     struct {
-        bool spare;
+        bool spare, taken;
         InstInfo instInfo;
         int nextInstAddr;
     } ID_EX;
@@ -75,6 +75,7 @@ private:
         BinaryInst _binaryInst; 
         _binaryInst = *(reinterpret_cast<BinaryInst*>(memorySpace + PC));
         
+        PC_pending = true;
         IF_ID.binaryInst = _binaryInst;
         IF_ID.nextInstAddr = PC + sizeof(BinaryInst);
         IF_ID.spare = false;
@@ -222,21 +223,27 @@ private:
             ++(registerStatus[2]);
         }
         
+        bool _taken;
         if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
-            PC_pending = true;
+            _taken = false;
+            PC += sizeof(BinaryInst);
+            PC_pending = false;
         }
         else if (InClosedInterval(_instInfo.instType, _j, _jalr)) {
             if (_instInfo.instType == _j || _instInfo.instType == _jal) 
                 PC = _instInfo.address.i;
             else 
                 PC = _instInfo.rsv.i;
+            PC_pending = false;
         }
         else {
             PC += sizeof(BinaryInst);
+            PC_pending = false;
         }
         
         ID_EX.instInfo = _instInfo;
         ID_EX.nextInstAddr = IF_ID.nextInstAddr;
+        ID_EX.taken = _taken;
         ID_EX.spare = false;
         ID_STA = false;
         IF_ID.spare = true;
@@ -368,9 +375,23 @@ private:
                 break;
             }
             if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
-                if (res.i == 1) PC = _instInfo.address.i;
-                else PC += sizeof(BinaryInst);
-                PC_pending = false;
+                // if prediction is wrong
+                if (res.i == 1 && (!ID_EX.taken)) {
+                    // reset IF && ID
+                    IF_STA = false;
+                    IF_ID.spare = true;
+                    ID_STA = false;
+                    PC = _instInfo.address.i;
+                    PC_pending = false;
+                }
+                else if (res.i == 0 && ID_EX.taken) {
+                    // reset IF && ID
+                    IF_STA = false;
+                    IF_ID.spare = true;
+                    ID_STA = false;
+                    PC = ID_EX.nextInstAddr;
+                    PC_pending = false;
+                }
             }
         }
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
