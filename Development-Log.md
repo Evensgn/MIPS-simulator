@@ -45,3 +45,4 @@ Zhou Fan (@Evensgn)
 * Found the bug, passed all test cases
 * Pushed the first useable version
 * Started writing the branch predictor
+* Finished the `Two-Level Adaptive Predictor`

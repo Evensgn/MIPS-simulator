@@ -12,15 +12,19 @@ private:
     bool finished, exited, PC_pending;
     bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
     int registerStatus[registerNum];
+    
+    SaturatingCounter branchCache[branchCacheSize][branchHistorySize];    
+    bitset<branchHistoryBit> branchHistory[branchCacheSize];
+
     struct {
         bool spare;
         BinaryInst binaryInst;
-        int nextInstAddr;
+        int nextInstAddr, thisInstAddr;
     } IF_ID;
     struct {
         bool spare, taken;
         InstInfo instInfo;
-        int nextInstAddr;
+        int nextInstAddr, instCacheIdx;
     } ID_EX;
     struct {
         bool spare;
@@ -77,6 +81,7 @@ private:
         
         PC_pending = true;
         IF_ID.binaryInst = _binaryInst;
+        IF_ID.thisInstAddr = PC;
         IF_ID.nextInstAddr = PC + sizeof(BinaryInst);
         IF_ID.spare = false;
         IF_STA = false;
@@ -224,9 +229,16 @@ private:
         }
         
         bool _taken;
+        int _instCacheIdx;
         if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
-            _taken = false;
-            PC += sizeof(BinaryInst);
+            bitset<branchCacheSizeBit> tmp;
+            tmp = IF_ID.thisInstAddr / sizeof(BinaryInst);
+            _instCacheIdx = tmp.to_ulong();
+            bitset<branchHistoryBit> _history;
+            _history = branchHistory[_instCacheIdx];
+            _taken = branchCache[_instCacheIdx][_history.to_ulong()].Taken();
+            if (_taken) PC = _instInfo.address.i; 
+            else PC += sizeof(BinaryInst);
             PC_pending = false;
         }
         else if (InClosedInterval(_instInfo.instType, _j, _jalr)) {
@@ -375,6 +387,12 @@ private:
                 break;
             }
             if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
+                // modify saturating counter
+                bitset<branchHistoryBit> _history = branchHistory[ID_EX.instCacheIdx];
+                branchCache[ID_EX.instCacheIdx][_history.to_ulong()].Modify(res.i);
+                _history = bitset<branchHistoryBit>((unsigned long)(_history.to_ulong() << 1));
+                _history[0] = res.i;
+                branchHistory[ID_EX.instCacheIdx] = _history;
                 // if prediction is wrong
                 if (res.i == 1 && (!ID_EX.taken)) {
                     // reset IF && ID
@@ -652,6 +670,8 @@ public:
         PC = mainLabelAddr;
         for (int i = 0; i < registerNum; ++i)
             registerStatus[i] = 0;
+        for (int i = 0; i < branchCacheSize; ++i)
+            branchHistory[i].reset();
         
 #ifdef DEBUG_PIPELINE
         cout << "Pipeline running:" << endl;

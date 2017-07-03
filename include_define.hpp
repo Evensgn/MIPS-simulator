@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <map>
 #include <string>
+#include <bitset>
 #include <vector>
 #include <cstddef>
 #include <fstream>
@@ -17,6 +18,8 @@ typedef unsigned char byte;
 
 const int maxMemoryByte = 4 * 1024 * 1024; // 4MB
 const int registerNum = 32 + 2;
+const int branchCacheSizeBit = 6, branchCacheSize = 64;
+const int branchHistoryBit = 4, branchHistorySize = 16;
 
 /*#define DEBUG
 #define DEBUG_REGISTER_NAME
