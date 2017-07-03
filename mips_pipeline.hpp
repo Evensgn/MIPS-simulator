@@ -389,8 +389,6 @@ private:
             switch (_instInfo.v0.i) {
             case 1:
                 cout << _instInfo.a0.i;
-                cout << "\n???" << endl;
-                system("pause");
                 break;
             case 5:
                 cin >> num;
@@ -401,11 +399,7 @@ private:
 #ifdef DEBUG_PIPELINE
                 cout << _instInfo.a1.i << endl;
 #endif
-                for (int i = 1; i < _instInfo.a1.i; ++i) {
-                    char c;
-                    if (!(cin >> c)) break;
-                    str += c;
-                }
+                cin >> str;
                 break;
             case 10:
                 exited = true;

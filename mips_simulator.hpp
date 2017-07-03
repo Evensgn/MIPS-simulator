@@ -47,7 +47,7 @@ public:
     void SimulatorInit() {
         MIPS_Entry_Processor::instance().RegisterIdxInit();
         MIPS_Text_Parser::instance().TokenTypeInit();
-        reg("$sp") = maxMemoryByte;
+        reg("$sp") = maxMemoryByte;        
         textMemoryTop = 0;
         for (int i = 0; i < registerNum; ++i) {
             if (i == 29) continue; // $sp

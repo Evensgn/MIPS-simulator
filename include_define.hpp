@@ -17,8 +17,8 @@ typedef unsigned char byte;
 
 const int maxMemoryByte = 4 * 1024 * 1024; // 4MB
 const int registerNum = 32 + 2;
-/*
-#define DEBUG
+
+/*#define DEBUG
 #define DEBUG_REGISTER_NAME
 #define DEBUG_READ_TEXT
 #define DEBUG_ENTRY_SPLIT
