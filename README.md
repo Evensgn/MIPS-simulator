@@ -28,7 +28,7 @@ For my detailed development log, please [check it out here](Development-Log.md).
 
 Branch prediction part is contained in the git branch `branch-prediction`.
 
-For branch instructions, this simulator uses an **Two-Level Adaptive Predictor** with `n == 2`. 
+For branch instructions, this simulator uses an **Two-Level Adaptive Predictor** with `n == 4`. 
 
 > A two-level adaptive predictor remembers the history of the last n occurrences of the branch and uses one saturating counter for each of the possible 2^n history patterns.
 > 

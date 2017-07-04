@@ -19,7 +19,7 @@ typedef unsigned char byte;
 const int maxMemoryByte = 4 * 1024 * 1024; // 4MB
 const int registerNum = 32 + 2;
 const int branchCacheSizeBit = 4, branchCacheSize = 16;
-const int branchHistoryBit = 6, branchHistorySize = 64;
+const int branchHistoryBit = 4, branchHistorySize = 16;
 
 /*#define DEBUG
 #define DEBUG_REGISTER_NAME
