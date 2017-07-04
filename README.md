@@ -27,12 +27,14 @@ For my detailed development log, please [check it out here](Development-Log.md).
 ### Branch Prediction
 
 Branch prediction part is contained in the git branch `branch-prediction`.
+
 For branch instructions, this simulator uses an **Two-Level Adaptive Predictor** with `n == 2`. 
+
 > A two-level adaptive predictor remembers the history of the last n occurrences of the branch and uses one saturating counter for each of the possible 2^n history patterns.
 > 
 > Branch Predictor - Wikipedia
 
-The finished branch predictor has an average prediction accuracy of 97%, which is rather satisfying.
+The finished branch predictor has an **average prediction accuracy of 97%**, which is rather satisfying.
 
 ### Instruction Encoding Format
 
