@@ -74,7 +74,8 @@ private:
         }
         BinaryInst _binaryInst; 
         _binaryInst = *(reinterpret_cast<BinaryInst*>(memorySpace + PC));
-        
+      
+        PC_pending = true;
         IF_ID.binaryInst = _binaryInst;
         IF_ID.nextInstAddr = PC + sizeof(BinaryInst);
         IF_ID.spare = false;
@@ -223,16 +224,17 @@ private:
         }
         
         if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
-            PC_pending = true;
         }
         else if (InClosedInterval(_instInfo.instType, _j, _jalr)) {
             if (_instInfo.instType == _j || _instInfo.instType == _jal) 
                 PC = _instInfo.address.i;
             else 
                 PC = _instInfo.rsv.i;
+            PC_pending = false;
         }
         else {
             PC += sizeof(BinaryInst);
+            PC_pending = false;
         }
         
         ID_EX.instInfo = _instInfo;
@@ -642,13 +644,6 @@ public:
             InstructionDecode();
             InstructionFetch();
         }
-        /*while (!finished && !exited) {
-            InstructionFetch();
-            InstructionDecode();
-            Execution();
-            MemoryAccess();
-            WriteBack();
-        }*/
         
         _dynamicDataMemoryTop = dynamicDataMemoryTop;
     }
