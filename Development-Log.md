@@ -46,3 +46,7 @@ Zhou Fan (@Evensgn)
 * Pushed the first useable version
 * Started writing the branch predictor
 * Finished the `Two-Level Adaptive Predictor`
+
+**July 4**
+* Found a bug in branch predictor and fixed it, the average prediction accuracy reached 97%
+* Started writing a multi-threading version of the five stage pipeline
