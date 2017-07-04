@@ -8,6 +8,7 @@ private:
     byte *memorySpace;
     Word *registers;
     int PC;
+    int branchCount, rightCount;
     int textMemoryTop, dynamicDataMemoryTop;
     bool finished, exited, PC_pending;
     bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
@@ -231,14 +232,13 @@ private:
         bool _taken;
         int _instCacheIdx;
         if (InClosedInterval(_instInfo.instType, _b, _bltz)) {
-            bitset<branchCacheSizeBit> tmp;
-            tmp = IF_ID.thisInstAddr / sizeof(BinaryInst);
+            bitset<branchCacheSizeBit> tmp(IF_ID.thisInstAddr / sizeof(BinaryInst));
             _instCacheIdx = tmp.to_ulong();
             bitset<branchHistoryBit> _history;
             _history = branchHistory[_instCacheIdx];
             _taken = branchCache[_instCacheIdx][_history.to_ulong()].Taken();
-            if (_taken) PC = _instInfo.address.i; 
-            else PC += sizeof(BinaryInst);
+            if (_taken) PC = _instInfo.address.i;
+            else PC = IF_ID.nextInstAddr;
             PC_pending = false;
         }
         else if (InClosedInterval(_instInfo.instType, _j, _jalr)) {
@@ -255,6 +255,7 @@ private:
         
         ID_EX.instInfo = _instInfo;
         ID_EX.nextInstAddr = IF_ID.nextInstAddr;
+        ID_EX.instCacheIdx = _instCacheIdx;
         ID_EX.taken = _taken;
         ID_EX.spare = false;
         ID_STA = false;
@@ -390,9 +391,10 @@ private:
                 // modify saturating counter
                 bitset<branchHistoryBit> _history = branchHistory[ID_EX.instCacheIdx];
                 branchCache[ID_EX.instCacheIdx][_history.to_ulong()].Modify(res.i);
-                _history = bitset<branchHistoryBit>((unsigned long)(_history.to_ulong() << 1));
+                _history = bitset<branchHistoryBit>(_history.to_ulong() << 1);
                 _history[0] = res.i;
                 branchHistory[ID_EX.instCacheIdx] = _history;
+                ++branchCount;
                 // if prediction is wrong
                 if (res.i == 1 && (!ID_EX.taken)) {
                     // reset IF && ID
@@ -410,6 +412,7 @@ private:
                     PC = ID_EX.nextInstAddr;
                     PC_pending = false;
                 }
+                else ++rightCount;
             }
         }
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
@@ -676,6 +679,7 @@ public:
 #ifdef DEBUG_PIPELINE
         cout << "Pipeline running:" << endl;
 #endif
+        branchCount = rightCount = 0;
         while (!finished && !exited) {
             WriteBack();
             MemoryAccess();
@@ -683,14 +687,8 @@ public:
             InstructionDecode();
             InstructionFetch();
         }
-        /*while (!finished && !exited) {
-            InstructionFetch();
-            InstructionDecode();
-            Execution();
-            MemoryAccess();
-            WriteBack();
-        }*/
-        
+        //clog << rightCount << "/" << branchCount << " " << (double)rightCount / (double)branchCount << endl;
+     
         _dynamicDataMemoryTop = dynamicDataMemoryTop;
     }
 };

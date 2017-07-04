@@ -123,18 +123,18 @@ private:
     bitset<2> status;
 public:
     SaturatingCounter() {
-        status.reset();
+        status = bitset<2>(2);
     }
     bool Taken() const {
         return status[1];
     }
     void Modify(bool flag) {
-        int x = int(status.to_ulong());
+        int x = status.to_ulong();
         if (flag) ++x;
         else --x;
         if (x == -1) x = 0;
         if (x == 4) x = 3;
-        status = bitset<2>((unsigned long long)x);
+        status = bitset<2>(x);
     }
 };
 
