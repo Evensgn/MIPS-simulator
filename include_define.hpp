@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <atomic>
 #include <cstddef>
 #include <fstream>
 #include <sstream>

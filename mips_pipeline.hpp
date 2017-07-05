@@ -7,29 +7,30 @@ class MIPS_Pipeline {
 private:
     byte *memorySpace;
     Word *registers;
-    int PC;
+    atomic<int> PC;
     int textMemoryTop, dynamicDataMemoryTop;
-    bool finished, exited, PC_pending;
-    bool IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
-    int registerStatus[registerNum];
+    atomic<bool> finished, exited, PC_pending;
+    atomic<bool> IF_STA, ID_STA, EX_STA, MEM_STA, WB_STA;
+    atomic<int> registerStatus[registerNum];
     struct {
-        bool spare;
+        atomic<bool> spare;
         BinaryInst binaryInst;
         int nextInstAddr;
     } IF_ID;
     struct {
-        bool spare;
+        atomic<bool> spare;
         InstInfo instInfo;
         int nextInstAddr;
     } ID_EX;
     struct {
-        bool spare;
+        atomic<bool> spare;
         InstInfo2 instInfo2;
         Word res, res0, res1;
         string str;
+        int num;
     } EX_MEM;
     struct {
-        bool spare;
+        atomic<bool> spare;
         InstInfo2 instInfo2;
         Word res, res0, res1;
     } MEM_WB;
@@ -47,7 +48,8 @@ private:
 #endif
             return;
         }
-        if (ID_STA || PC_pending) {
+        IF_STA = false;
+        if (PC_pending) {
             IF_STA = true;
 #ifdef DEBUG_PIPELINE
             if (ID_STA) cout << "RETURN: ID_STA" << endl;
@@ -75,11 +77,20 @@ private:
         BinaryInst _binaryInst; 
         _binaryInst = *(reinterpret_cast<BinaryInst*>(memorySpace + PC));
       
+        
+         //clog << "a";
+        while (!IF_ID.spare) {
+            if (ID_STA) {
+                IF_STA = true;
+                 //clog << "A";
+                return;
+            }
+        }
         PC_pending = true;
         IF_ID.binaryInst = _binaryInst;
         IF_ID.nextInstAddr = PC + sizeof(BinaryInst);
         IF_ID.spare = false;
-        IF_STA = false;
+         //clog << "a";
     }
     
     void InstructionDecode() {
@@ -95,19 +106,10 @@ private:
 #endif
             return;
         }
+        ID_STA = false; 
         if (IF_ID.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-#ifdef DEBUG_PAUSE 
-            system("pause"); 
-#endif
-#endif
-            return;
-        }
-        if (EX_STA) {
-            ID_STA = true;
-#ifdef DEBUG_PIPELINE
-            cout << "RETURN: EX_STA" << endl;
 #ifdef DEBUG_PAUSE 
             system("pause"); 
 #endif
@@ -129,6 +131,8 @@ private:
         _instInfo.constant = inst.constant;
         _instInfo.offset = inst.offset;
         _instInfo.address = inst.address;
+        int _nextInstAddr = IF_ID.nextInstAddr;
+                
         if (inst.rs != byte(255)) {
             // register is to be written
             if (registerStatus[inst.rs] != 0) {
@@ -237,11 +241,20 @@ private:
             PC_pending = false;
         }
         
-        ID_EX.instInfo = _instInfo;
-        ID_EX.nextInstAddr = IF_ID.nextInstAddr;
-        ID_EX.spare = false;
-        ID_STA = false;
+        
+         //clog << "b";
+        while (!ID_EX.spare) {
+            if (EX_STA) {
+                ID_STA = true;
+                 //clog << "B";
+                return;  
+            }
+        }
         IF_ID.spare = true;
+        ID_EX.instInfo = _instInfo;
+        ID_EX.nextInstAddr = _nextInstAddr;
+        ID_EX.spare = false;
+         //clog << "b";
     }
     
     void Execution() {
@@ -257,19 +270,10 @@ private:
 #endif
             return;
         }
+        EX_STA = false;
         if (ID_EX.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-#ifdef DEBUG_PAUSE 
-            system("pause"); 
-#endif
-#endif
-            return;
-        }
-        if (MEM_STA) {
-            EX_STA = true;
-#ifdef DEBUG_PIPELINE
-            cout << "RETURN: MEM_STA" << endl;
 #ifdef DEBUG_PAUSE 
             system("pause"); 
 #endif
@@ -281,9 +285,12 @@ private:
         cout << "Execution: " << (int)ID_EX.instInfo.instType << endl;
 #endif
         InstInfo _instInfo = ID_EX.instInfo;
+        int _nextInstAddr = ID_EX.nextInstAddr;
+        
         Word a0, a1, res, res0, res1;
         Double resd;
         string str;
+        int _num;
         if (InClosedInterval(_instInfo.instType, _neg, _negu)) {
             a0 = _instInfo.rsv;
             if (_instInfo.instType == _neg) res.i = -a0.i;
@@ -376,7 +383,7 @@ private:
             }
         }
         else if (_instInfo.instType == _jal || _instInfo.instType == _jalr) {
-            res.i = ID_EX.nextInstAddr;
+            res.i = _nextInstAddr;
         }
         else if (InClosedInterval(_instInfo.instType, _la, _sw)) {
             if (_instInfo.rte) {
@@ -390,7 +397,7 @@ private:
             int num;
             switch (_instInfo.v0.i) {
             case 1:
-                cout << _instInfo.a0.i;
+                _num = _instInfo.a0.i;
                 break;
             case 5:
                 cin >> num;
@@ -430,14 +437,23 @@ private:
         cout << "res: " << res.i << endl;
 #endif
         
+         //clog << "c";
+        while (!EX_MEM.spare) {
+            if (MEM_STA) {
+                EX_STA = true;
+                 //clog << "C";
+                return;
+            }
+        }
+        ID_EX.spare = true;
         EX_MEM.instInfo2 = _instInfo2;
         EX_MEM.res = res;
         EX_MEM.res0 = res0;
         EX_MEM.res1 = res1;
         EX_MEM.str = str;
+        EX_MEM.num = _num;
         EX_MEM.spare = false;
-        EX_STA = false;
-        ID_EX.spare = true;
+         //clog << "c";
     }
         
     void MemoryAccess() {
@@ -453,19 +469,10 @@ private:
 #endif
             return;
         }
+        MEM_STA = false;
         if (EX_MEM.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
-#ifdef DEBUG_PAUSE 
-            system("pause"); 
-#endif
-#endif
-            return;
-        }
-        if (WB_STA) {
-            MEM_STA = true;
-#ifdef DEBUG_PIPELINE
-            cout << "RETURN: WB_STA" << endl;
 #ifdef DEBUG_PAUSE 
             system("pause"); 
 #endif
@@ -477,8 +484,9 @@ private:
         cout << "Memory Access:"  << (int)EX_MEM.instInfo2.instType << " " << EX_MEM.instInfo2.address.i << endl;
 #endif
         InstInfo2 _instInfo2 = EX_MEM.instInfo2;
-        Word res = EX_MEM.res;
+        Word res = EX_MEM.res, _res0 = EX_MEM.res0, _res1 = EX_MEM.res1;
         string str = EX_MEM.str;
+        int num = EX_MEM.num;
                 
         int pos;
         byte bt;
@@ -519,6 +527,9 @@ private:
             break;
         case _syscall:
             switch (_instInfo2.v0.i) {
+            case 1:
+                cout << num;
+                break;
             case 4:
                 str = "";
                 pos = _instInfo2.a0.i;
@@ -548,13 +559,21 @@ private:
             break;
         }
         
+         //clog << "d";
+        while (!MEM_WB.spare) {
+            if (WB_STA) {
+                MEM_STA = true;
+                 //clog << "D";
+                return;
+            }
+        }
+        EX_MEM.spare = true;
         MEM_WB.instInfo2 = _instInfo2;
         MEM_WB.res = res;
-        MEM_WB.res0 = EX_MEM.res0;
-        MEM_WB.res1 = EX_MEM.res1;
+        MEM_WB.res0 = _res0;
+        MEM_WB.res1 = _res1;
         MEM_WB.spare = false;
-        MEM_STA = false;
-        EX_MEM.spare = true;
+         //clog << "d";
     }
     
     void WriteBack() {
@@ -570,6 +589,7 @@ private:
 #endif
             return;
         }
+        WB_STA = false;
         if (MEM_WB.spare) {
 #ifdef DEBUG_PIPELINE
             cout << "RETURN: spare" << endl;
@@ -584,10 +604,12 @@ private:
         cout << "Write Back:" << endl;
 #endif
         InstInfo2 _instInfo2 = MEM_WB.instInfo2;
+        Word _res = MEM_WB.res, _res0 = MEM_WB.res0, _res1 = MEM_WB.res1;
+        
         if (_instInfo2.rd != byte(255)) {
             if (InClosedInterval(_instInfo2.instType, _move, _mflo)) 
                 registers[_instInfo2.rd] = _instInfo2.rsv;
-            else registers[_instInfo2.rd] = MEM_WB.res;
+            else registers[_instInfo2.rd] = _res;
             --(registerStatus[_instInfo2.rd]);
 #ifdef DEBUG_PIPELINE
             cout << "Write register " << (int)_instInfo2.rd << " <- " << registers[_instInfo2.rd].i << endl;
@@ -598,40 +620,58 @@ private:
 #endif
         }
         else if (InClosedInterval(_instInfo2.instType, _mul, _divu) && _instInfo2.rd == byte(255)) {
-            registers[32] = MEM_WB.res0;
-            registers[33] = MEM_WB.res1;
+            registers[32] = _res0;
+            registers[33] = _res1;
             --(registerStatus[32]);
             --(registerStatus[33]);
         }
         else if (_instInfo2.instType == _syscall && (_instInfo2.v0.i == 5 || _instInfo2.v0.i == 9)) {
             // $v0
-            registers[2] = MEM_WB.res;
+            registers[2] = _res;
             --(registerStatus[2]);
         }
         
-        WB_STA = false;
+         //clog << "e";
         MEM_WB.spare = true;
+         //clog << "e";
     }
     
     mutex tick_mtx;
-    bool tick_ready[5], stageDone[5];
-    condition_variable tick;
+    bool tick_ready[5], tock_ready[5], stageDone[5];
+    condition_variable tick, tock;
     void TInstructionFetch() {
         while (!finished && !exited) {
             unique_lock<mutex> lk(tick_mtx);
             while (!tick_ready[0]) tick.wait(lk);
             tick_ready[0] = false;
+             //clog << "IF" << endl;
+            lk.unlock();
             InstructionFetch();
+             //clog << "0";
             stageDone[0] = true;
+            lk.lock();
+            while (!tock_ready[0]) tock.wait(lk);
+            tock_ready[0] = false;
+            lk.unlock();
+            if (finished || exited) break;
         }
+         //clog << "I Quit ;-)" << endl;
     }
     void TInstructionDecode() {
         while (!finished && !exited) {
             unique_lock<mutex> lk(tick_mtx);
             while (!tick_ready[1]) tick.wait(lk);
             tick_ready[1] = false;
+             //clog << "ID" << endl;
+            lk.unlock();
             InstructionDecode();
+             //clog << "1";
             stageDone[1] = true;
+            lk.lock();
+            while (!tock_ready[1]) tock.wait(lk);
+            tock_ready[1] = false;
+            lk.unlock();
+            if (finished || exited) break;
         }
     }
     void TExecution() {
@@ -639,8 +679,16 @@ private:
             unique_lock<mutex> lk(tick_mtx);
             while (!tick_ready[2]) tick.wait(lk);
             tick_ready[2] = false;
+             //clog << "EX" << endl;
+            lk.unlock();
             Execution();
+             //clog << "2";
             stageDone[2] = true;
+            lk.lock();
+            while (!tock_ready[2]) tock.wait(lk);
+            tock_ready[2] = false;
+            lk.unlock();
+            if (finished || exited) break;
         }
     } 
     void TMemoryAccess() {
@@ -648,8 +696,16 @@ private:
             unique_lock<mutex> lk(tick_mtx);
             while (!tick_ready[3]) tick.wait(lk);
             tick_ready[3] = false;
+             //clog << "MEM" << endl;
+            lk.unlock();
             MemoryAccess();
+             //clog << "3";
             stageDone[3] = true;
+            lk.lock();
+            while (!tock_ready[3]) tock.wait(lk);
+            tock_ready[3] = false;
+            lk.unlock();
+            if (finished || exited) break;
         }
     }
     void TWriteBack() {
@@ -657,8 +713,16 @@ private:
             unique_lock<mutex> lk(tick_mtx);
             while (!tick_ready[4]) tick.wait(lk);
             tick_ready[4] = false;
+             //clog << "WB" << endl;
+            lk.unlock();
             WriteBack();
+             //clog << "4";
             stageDone[4] = true;
+            lk.lock();
+            while (!tock_ready[4]) tock.wait(lk);
+            tock_ready[4] = false;
+            lk.unlock();
+            if (finished || exited) break;
         }
     }
     
@@ -687,13 +751,13 @@ public:
         cout << "Pipeline running:" << endl;
 #endif
         for (int i = 0; i < 5; ++i)
-            tick_ready[i] = stageDone[i] = false;
+            tick_ready[i] = tock_ready[i] = stageDone[i] = false;
         
-        thread InstructionFetchThread(TInstructionFetch, this);
-        thread InstructionDecodeThread(TInstructionDecode, this);
-        thread ExecutionThread(TExecution, this);
-        thread MemoryAccessThread(TMemoryAccess, this);
-        thread WriteBackThread(TWriteBack, this);
+        thread InstructionFetchThread([this]{this->TInstructionFetch();});
+        thread InstructionDecodeThread([this]{this->TInstructionDecode();});
+        thread ExecutionThread([this]{this->TExecution();});
+        thread MemoryAccessThread([this]{this->TMemoryAccess();});
+        thread WriteBackThread([this]{this->TWriteBack();});
         
         while (!finished && !exited) {
             unique_lock<mutex> lk(tick_mtx);
@@ -701,6 +765,7 @@ public:
                 tick_ready[i] = true;
                 stageDone[i] = false;
             }
+             //clog << "\n=========== Tick ===========" << endl;
             tick.notify_all();
             lk.unlock();
             bool allDone = false;
@@ -709,21 +774,22 @@ public:
                 for (int i = 0; i < 5; ++i)
                     allDone = allDone && stageDone[i];
             }
+            lk.lock();
+            for (int i = 0; i < 5; ++i)
+                tock_ready[i] = true;
+             //clog << "\n=========== Tock ===========" << endl;
+            tock.notify_all();
+            lk.unlock();
+            if (finished || exited) break;
         }
+        
+         //clog << "Finished!" << endl;
         
         InstructionFetchThread.join();
         InstructionDecodeThread.join();
         ExecutionThread.join();
         MemoryAccessThread.join();
         WriteBackThread.join();
-        
-        /*while (!finished && !exited) {
-            WriteBack();
-            MemoryAccess();
-            Execution();
-            InstructionDecode();
-            InstructionFetch();
-        }*/
         
         _dynamicDataMemoryTop = dynamicDataMemoryTop;
     }

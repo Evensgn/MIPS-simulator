@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -std=c++11 -O2
+CFLAGS = -Wall -std=c++11 -O2 -pthread
 
 ################!! MODIFY HERE !!####################
 _OBJ = main.o

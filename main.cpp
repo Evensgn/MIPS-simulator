@@ -9,8 +9,6 @@ bool ready = false;
 
 int main(int argc, char *argv[])
 {
-    MIPS_Simulator::instance().RunPipeline();
-    return 0;    
     MIPS_Simulator::instance().SimulatorInit();
     // read mips text from file *.s
     ifstream sFile(argv[1]);
@@ -20,7 +18,7 @@ int main(int argc, char *argv[])
     sFile.close();
     string mipsSourceText = buffer.str();
 #ifdef DEBUG_READ_TEXT
-    cout << mipsSourceText << endl;
+    cout << mipsSourceText << endl;ad(TExecution
 #endif
     MIPS_Simulator::instance().ProcessMIPSText(mipsSourceText);
     MIPS_Simulator::instance().RunPipeline();
