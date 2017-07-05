@@ -613,6 +613,55 @@ private:
         MEM_WB.spare = true;
     }
     
+    mutex tick_mtx;
+    bool tick_ready[5], stageDone[5];
+    condition_variable tick;
+    void TInstructionFetch() {
+        while (!finished && !exited) {
+            unique_lock<mutex> lk(tick_mtx);
+            while (!tick_ready[0]) tick.wait(lk);
+            tick_ready[0] = false;
+            InstructionFetch();
+            stageDone[0] = true;
+        }
+    }
+    void TInstructionDecode() {
+        while (!finished && !exited) {
+            unique_lock<mutex> lk(tick_mtx);
+            while (!tick_ready[1]) tick.wait(lk);
+            tick_ready[1] = false;
+            InstructionDecode();
+            stageDone[1] = true;
+        }
+    }
+    void TExecution() {
+        while (!finished && !exited) {
+            unique_lock<mutex> lk(tick_mtx);
+            while (!tick_ready[2]) tick.wait(lk);
+            tick_ready[2] = false;
+            Execution();
+            stageDone[2] = true;
+        }
+    } 
+    void TMemoryAccess() {
+        while (!finished && !exited) {
+            unique_lock<mutex> lk(tick_mtx);
+            while (!tick_ready[3]) tick.wait(lk);
+            tick_ready[3] = false;
+            MemoryAccess();
+            stageDone[3] = true;
+        }
+    }
+    void TWriteBack() {
+        while (!finished && !exited) {
+            unique_lock<mutex> lk(tick_mtx);
+            while (!tick_ready[4]) tick.wait(lk);
+            tick_ready[4] = false;
+            WriteBack();
+            stageDone[4] = true;
+        }
+    }
+    
     MIPS_Pipeline() = default;
     MIPS_Pipeline(const MIPS_Pipeline&);
     MIPS_Pipeline& operator=(const MIPS_Pipeline&);
@@ -637,13 +686,44 @@ public:
 #ifdef DEBUG_PIPELINE
         cout << "Pipeline running:" << endl;
 #endif
+        for (int i = 0; i < 5; ++i)
+            tick_ready[i] = stageDone[i] = false;
+        
+        thread InstructionFetchThread(TInstructionFetch, this);
+        thread InstructionDecodeThread(TInstructionDecode, this);
+        thread ExecutionThread(TExecution, this);
+        thread MemoryAccessThread(TMemoryAccess, this);
+        thread WriteBackThread(TWriteBack, this);
+        
         while (!finished && !exited) {
+            unique_lock<mutex> lk(tick_mtx);
+            for (int i = 0; i < 5; ++i) {
+                tick_ready[i] = true;
+                stageDone[i] = false;
+            }
+            tick.notify_all();
+            lk.unlock();
+            bool allDone = false;
+            while (!allDone) {
+                allDone = true;
+                for (int i = 0; i < 5; ++i)
+                    allDone = allDone && stageDone[i];
+            }
+        }
+        
+        InstructionFetchThread.join();
+        InstructionDecodeThread.join();
+        ExecutionThread.join();
+        MemoryAccessThread.join();
+        WriteBackThread.join();
+        
+        /*while (!finished && !exited) {
             WriteBack();
             MemoryAccess();
             Execution();
             InstructionDecode();
             InstructionFetch();
-        }
+        }*/
         
         _dynamicDataMemoryTop = dynamicDataMemoryTop;
     }

@@ -44,3 +44,6 @@ Zhou Fan (@Evensgn)
 * Last two test cases was left to be passed
 * Found the bug, passed all test cases
 * Pushed the first useable version
+
+**July 5**
+* Started writing the multi-threading version

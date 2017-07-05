@@ -3,8 +3,14 @@
 
 using namespace std;
 
+mutex mtx;
+condition_variable cv;
+bool ready = false;
+
 int main(int argc, char *argv[])
 {
+    MIPS_Simulator::instance().RunPipeline();
+    return 0;    
     MIPS_Simulator::instance().SimulatorInit();
     // read mips text from file *.s
     ifstream sFile(argv[1]);
