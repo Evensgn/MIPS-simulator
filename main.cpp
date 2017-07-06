@@ -3,14 +3,14 @@
 
 using namespace std;
 
-mutex mtx;
-condition_variable cv;
-bool ready = false;
-
 int main(int argc, char *argv[])
 {
     MIPS_Simulator::instance().SimulatorInit();
     // read mips text from file *.s
+    if (argc < 2) {
+        cout << "fatal : no input file" << endl;
+        return 0;
+    }
     ifstream sFile(argv[1]);
     //ifstream sFile("function_test-huyuncong.s");
     stringstream buffer;

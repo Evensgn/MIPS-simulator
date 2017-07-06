@@ -11,8 +11,6 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include "evensgn_string.hpp"
 #include "global_class.hpp"
 #include "utility.hpp"
