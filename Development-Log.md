@@ -49,3 +49,7 @@ Zhou Fan (@Evensgn)
 * Started writing the multi-threading version
 * Learned about C++ multi-threading features
 * Started debugging the multi-threading version
+
+**July 6**
+* The multi-threading version passed the test
+

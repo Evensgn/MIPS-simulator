@@ -78,12 +78,12 @@ private:
         _binaryInst = *(reinterpret_cast<BinaryInst*>(memorySpace + PC));
       
         
-        //clog << "a";
+        ////clog << "a";
         while (!IF_ID.spare) {
             if (finished || exited) return;
             if (ID_STA) {
                 IF_STA = true;
-                //clog << "A";
+                ////clog << "A";
                 return;
             }
         }
@@ -91,7 +91,7 @@ private:
         IF_ID.binaryInst = _binaryInst;
         IF_ID.nextInstAddr = PC + sizeof(BinaryInst);
         IF_ID.spare = false;
-        //clog << "a";
+        ////clog << "a";
     }
     
     void InstructionDecode() {
@@ -243,12 +243,12 @@ private:
         }
         
         
-        //clog << "b";
+        ////clog << "b";
         while (!ID_EX.spare) {
             if (finished || exited) return;
             if (EX_STA) {
                 ID_STA = true;
-                //clog << "B";
+                ////clog << "B";
                 return;  
             }
         }
@@ -256,7 +256,7 @@ private:
         ID_EX.instInfo = _instInfo;
         ID_EX.nextInstAddr = _nextInstAddr;
         ID_EX.spare = false;
-        //clog << "b";
+        ////clog << "b";
     }
     
     void Execution() {
@@ -439,12 +439,12 @@ private:
         cout << "res: " << res.i << endl;
 #endif
         
-        //clog << "c";
+        ////clog << "c";
         while (!EX_MEM.spare) {
             if (finished || exited) return;
             if (MEM_STA) {
                 EX_STA = true;
-                //clog << "C";
+                ////clog << "C";
                 return;
             }
         }
@@ -456,7 +456,7 @@ private:
         EX_MEM.str = str;
         EX_MEM.num = _num;
         EX_MEM.spare = false;
-        //clog << "c";
+        ////clog << "c";
     }
         
     void MemoryAccess() {
@@ -562,12 +562,12 @@ private:
             break;
         }
         
-        //clog << "d";
+        ////clog << "d";
         while (!MEM_WB.spare) {
             if (finished || exited) return;
             if (WB_STA) {
                 MEM_STA = true;
-                //clog << "D";
+                ////clog << "D";
                 return;
             }
         }
@@ -577,7 +577,7 @@ private:
         MEM_WB.res0 = _res0;
         MEM_WB.res1 = _res1;
         MEM_WB.spare = false;
-        //clog << "d";
+        ////clog << "d";
     }
     
     void WriteBack() {
@@ -635,97 +635,97 @@ private:
             --(registerStatus[2]);
         }
         
-        //clog << "e";
+        ////clog << "e";
         MEM_WB.spare = true;
-        //clog << "e";
+        ////clog << "e";
     }
     
     atomic<bool> tick_ready[5], tock_ready[5], stageDone[5], tockDone[5];
     atomic<bool> allDone, allTockDone, tick, tock;
     void TInstructionFetch() {
         while (!finished && !exited) {
-            //clog << "M" << endl;
+            ////clog << "M" << endl;
             while (!tick || !tick_ready[0]) ;
             tick_ready[0] = false;
-            //clog << "IF" << endl;
+            ////clog << "IF" << endl;
             InstructionFetch();
-            //clog << "0";
+            ////clog << "0";
             stageDone[0] = true;
             while (!tock || !tock_ready[0]) ;
             tock_ready[0] = false;
             tockDone[0] = true;
-            //clog << "m" << endl;
+            ////clog << "m" << endl;
             if (finished || exited) break;
         }
-        clog << "I Quit 0 ;-)" << endl;
+        //clog << "I Quit 0 ;-)" << endl;
     }
     void TInstructionDecode() {
         while (!finished && !exited) {
-            //clog << "N" << endl;
+            ////clog << "N" << endl;
             while (!tick || !tick_ready[1]) ;
             tick_ready[1] = false;
-            //clog << "ID" << endl;
+            ////clog << "ID" << endl;
             InstructionDecode();
-            //clog << "1";
+            ////clog << "1";
             stageDone[1] = true;
             while (!tock || !tock_ready[1]) ;
             tock_ready[1] = false;
             tockDone[1] = true;
-            //clog << "n" << endl;
+            ////clog << "n" << endl;
             if (finished || exited) break;
         }
-        clog << "I Quit 1 ;-)" << endl;
+        //clog << "I Quit 1 ;-)" << endl;
     }
     void TExecution() {
         while (!finished && !exited) {
-            //clog << "O" << endl;
+            ////clog << "O" << endl;
             while (!tick || !tick_ready[2]) ;
             tick_ready[2] = false;
-            //clog << "EX" << endl;
+            ////clog << "EX" << endl;
             Execution();
-            //clog << "2";
+            ////clog << "2";
             stageDone[2] = true;
             while (!tock || !tock_ready[2]) ;
             tock_ready[2] = false;
             tockDone[2] = true;
-            //clog << "o" << endl;
+            ////clog << "o" << endl;
             if (finished || exited) break;
         }
-        clog << "I Quit 2 ;-)" << endl;
+        //clog << "I Quit 2 ;-)" << endl;
     } 
     void TMemoryAccess() {
         while (!finished && !exited) {
-            //clog << "P" << endl;
+            ////clog << "P" << endl;
             while (!tick || !tick_ready[3]) ;
             tick_ready[3] = false;
-            //clog << "MEM" << endl;
+            ////clog << "MEM" << endl;
             MemoryAccess();
-            //clog << "3";
+            ////clog << "3";
             stageDone[3] = true;
             while (!tock || !tock_ready[3]) ;
             tock_ready[3] = false;
             tockDone[3] = true;
-            //clog << "p" << endl;
+            ////clog << "p" << endl;
             if (finished || exited) break;
         }
-        clog << "I Quit 3 ;-)" << endl;
+        //clog << "I Quit 3 ;-)" << endl;
     }
     void TWriteBack() {
         while (!finished && !exited) {
-            //clog << "Q" << endl;
+            ////clog << "Q" << endl;
             while (!tick || !tick_ready[4]) ;
             tick_ready[4] = false;
-            //clog << "WB" << endl;
+            ////clog << "WB" << endl;
             WriteBack();
-            //clog << "4";
+            ////clog << "4";
             stageDone[4] = true;
             while (!tock || !tock_ready[4]) ;
             tock_ready[4] = false;
             tockDone[4] = true;
-            //clog << "q" << endl;
+            ////clog << "q" << endl;
             if (finished || exited) break;
         }
-        clog << "I Quit 4 ;-)" << endl;
+        //clog << "I Quit 4 ;-)" << endl;
     }
     
     MIPS_Pipeline() = default;
@@ -767,7 +767,7 @@ public:
                 tick_ready[i] = true;
                 stageDone[i] = false;
             }
-            //clog << "\n=========== Tick ===========" << endl;
+            ////clog << "\n=========== Tick ===========" << endl;
             tock = false;
             tick = true;
             allDone = false;
@@ -780,7 +780,7 @@ public:
                 tock_ready[i] = true;
             tick = false;
             tock = true;
-            //clog << "\n=========== Tock ===========" << endl;
+            ////clog << "\n=========== Tock ===========" << endl;
             allTockDone = false;
             while (!allTockDone) {
                 allTockDone = true;
@@ -792,7 +792,7 @@ public:
             if (finished || exited) break;
         }
         
-        //clog << "Finished!" << endl;
+        ////clog << "Finished!" << endl;
         
         InstructionFetchThread.join();
         InstructionDecodeThread.join();
