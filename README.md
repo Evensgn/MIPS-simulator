@@ -7,7 +7,6 @@ This is a course project of PPCA 2017 (MS106), ACM Honors Class, SJTU.
 ## Related Documents
 
 * [Assignment Manual](assignment-files/mips-simulator.pdf)
-
 * [Specified Instruction Subset](documents/instructions.txt) (instructions involved in this project)
 
 ## Development Log
