@@ -2,7 +2,7 @@
 
 Zhou Fan (@Evensgn)
 
-This is a course project of PPCA 2017 (MS106), ACM Honors Class, SJTU.
+This is a course project of PPCA 2017, ACM Honors Class, SJTU.
 
 ## Related Documents
 
